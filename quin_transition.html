@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quin · Widget → Detail</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #EEEAE2; --widget-bg: #FFFFFF;
+  --text-dark: #1C1A2E; --text-mid: #6B6680; --text-light: #A09CB0;
+  --gold: #C09050; --card-bg: #FBF8F2; --card-border: #E4DDD0;
+  --yes: #3FA876; --no: #CC5858; --maybe: #7E62B8;
+  --shadow: 0 24px 60px rgba(28,26,46,.20), 0 4px 16px rgba(28,26,46,.08);
+  --phone-r: 44px;
+  --quin-bg: #EEE8F8; --quin-purple: #7B6BB5; --quin-dark: #1A1535;
+}
+body {
+  background: var(--bg); min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: 'DM Sans', sans-serif; gap: 20px; padding: 40px 24px;
+}
+.pg-label { font-size: 11px; color: var(--text-light); letter-spacing: .14em; text-transform: uppercase; }
+.picker { display: flex; gap: 8px; }
+.pk { padding: 6px 16px; border-radius: 24px; border: 1.5px solid #D6D0C8; background: transparent; font-size: 12px; color: var(--text-mid); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .15s; }
+.pk:hover:not(.on) { border-color: var(--text-dark); color: var(--text-dark); }
+.pk.on { background: var(--text-dark); color: #fff; border-color: var(--text-dark); }
+
+/* Phone */
+.phone { width: 320px; height: 640px; border-radius: var(--phone-r); box-shadow: var(--shadow); position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,.6); background: var(--quin-bg); }
+.notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 110px; height: 30px; background: #1C1A2E; border-radius: 0 0 18px 18px; z-index: 200; }
+
+/* ══ SCREEN 1: DESKTOP ══ */
+#screen-home { position: absolute; inset: 0; z-index: 1; transition: opacity .3s ease; }
+.wallpaper { position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 20%, rgba(218,205,185,.6) 0%, transparent 55%), radial-gradient(ellipse at 75% 70%, rgba(200,218,205,.4) 0%, transparent 50%), #F8F5EF; }
+.status-bar { position: absolute; top: 0; left: 0; right: 0; height: 44px; display: flex; align-items: flex-end; padding: 0 22px 6px; justify-content: space-between; z-index: 10; }
+.s-time { font-size: 13px; font-weight: 600; color: var(--text-dark); }
+.s-icons { display: flex; gap: 5px; align-items: center; }
+.s-icons svg { width: 14px; height: 14px; }
+.widget-wrap { position: absolute; top: 64px; left: 14px; z-index: 5; }
+.widget { width: 292px; height: 138px; background: var(--widget-bg); border-radius: 20px; box-shadow: 0 8px 28px rgba(28,26,46,.13), 0 2px 8px rgba(28,26,46,.06); overflow: hidden; position: relative; }
+.w-mini { position: absolute; top: 10px; left: 16px; font-family: 'Cormorant Garamond', serif; font-size: 9.5px; color: var(--text-light); letter-spacing: .07em; }
+.w-left { position: absolute; left: 16px; top: 0; bottom: 0; width: 174px; display: flex; flex-direction: column; justify-content: center; gap: 7px; }
+.w-answer { font-family: 'Cormorant Garamond', serif; font-size: 56px; font-weight: 600; line-height: .92; }
+.w-answer.yes{color:var(--yes)} .w-answer.no{color:var(--no)} .w-answer.maybe{color:var(--maybe)}
+.w-cta { display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 20px; color: white; font-size: 10.5px; font-weight: 500; border: none; cursor: pointer; width: fit-content; font-family: 'DM Sans', sans-serif; transition: opacity .12s, transform .1s; position: relative; z-index: 10; }
+.w-cta:active { transform: scale(.95); opacity: .85; }
+.w-cta.yes{background:var(--yes)} .w-cta.no{background:var(--no)} .w-cta.maybe{background:var(--maybe)}
+.w-right { position: absolute; right: 14px; top: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
+.w-card { width: 56px; height: 88px; border-radius: 7px; background: var(--card-bg); border: 1px solid var(--card-border); box-shadow: 0 3px 10px rgba(28,26,46,.09); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.w-card-name { font-size: 8px; color: var(--text-light); text-align: center; line-height: 1.4; }
+.w-reset { position: absolute; top: 8px; right: 8px; width: 23px; height: 23px; border-radius: 50%; background: rgba(160,156,176,.13); border: none; font-size: 12px; color: var(--text-mid); display: flex; align-items: center; justify-content: center; }
+.home-icons { position: absolute; bottom: 72px; left: 0; right: 0; display: flex; justify-content: center; gap: 14px; padding: 0 24px; }
+.app-icon { width: 52px; height: 52px; border-radius: 13px; background: rgba(255,255,255,.55); border: 1px solid rgba(255,255,255,.7); }
+.home-icons-row2 { position: absolute; bottom: 136px; left: 0; right: 0; display: flex; justify-content: center; gap: 14px; padding: 0 24px; }
+.dock { position: absolute; bottom: 16px; left: 20px; right: 20px; height: 52px; border-radius: 20px; background: rgba(255,255,255,.55); border: 1px solid rgba(255,255,255,.7); display: flex; align-items: center; justify-content: space-around; padding: 0 16px; }
+.dock-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(200,195,215,.35); }
+.dock-icon.quin { background: linear-gradient(135deg, #3FA876 0%, #2D7E5B 100%); display: flex; align-items: center; justify-content: center; }
+
+/* ── Clickable zone annotations ── */
+.click-zone {
+  position: absolute;
+  border: 2px dashed rgba(255,180,0,.75);
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 100;
+}
+.click-label {
+  position: absolute;
+  background: rgba(255,180,0,.92);
+  color: #1C1A2E; font-size: 8.5px; font-weight: 700;
+  padding: 2px 6px; border-radius: 6px;
+  white-space: nowrap; pointer-events: none; z-index: 101; letter-spacing: .02em;
+}
+.legend {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; color: var(--text-mid);
+  padding: 6px 12px; background: rgba(255,255,255,.7);
+  border-radius: 20px; border: 1px solid rgba(255,180,0,.35);
+}
+.legend-dash { width: 18px; height: 0; border-top: 2px dashed rgba(255,180,0,.75); }
+
+/* Transition */
+#t-overlay { position: absolute; inset: 0; z-index: 50; pointer-events: none; opacity: 0; }
+#t-overlay.active { pointer-events: all; }
+.expand-rect { position: absolute; top: 118px; left: 14px; width: 120px; height: 30px; border-radius: 16px; background: var(--widget-bg); transition: top .52s cubic-bezier(0.34,1.06,0.64,1), left .52s cubic-bezier(0.34,1.06,0.64,1), width .52s cubic-bezier(0.34,1.06,0.64,1), height .52s cubic-bezier(0.34,1.06,0.64,1), border-radius .52s cubic-bezier(0.34,1.06,0.64,1); z-index: 51; }
+.expand-rect.expanded { top: 0; left: 0; width: 320px; height: 640px; border-radius: 44px; }
+
+/* ══ SCREEN 2: QUIN APP HOME ══ */
+#screen-app-home { position: absolute; inset: 0; z-index: 38; background: var(--quin-bg); opacity: 0; pointer-events: none; transition: opacity .25s ease; overflow: hidden; }
+#screen-app-home * { pointer-events: none !important; cursor: default !important; }
+#screen-app-home.visible { opacity: 1; }
+.quin-status { height: 44px; display: flex; align-items: flex-end; padding: 0 22px 6px; justify-content: space-between; }
+.quin-s-time { font-size: 13px; font-weight: 700; color: var(--quin-dark); }
+.quin-s-right { display: flex; gap: 6px; align-items: center; font-size: 12px; font-weight: 700; color: var(--quin-dark); }
+.quin-topbar { padding: 2px 22px 10px; display: flex; align-items: center; justify-content: space-between; }
+.quin-logo { font-size: 30px; font-weight: 800; color: var(--quin-dark); letter-spacing: -.02em; }
+.quin-topbar-icons { display: flex; gap: 16px; }
+.quin-promo { margin: 0 16px; background: rgba(255,255,255,.65); border-radius: 14px; padding: 10px 16px; display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,.85); }
+.quin-promo-icon { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg,rgba(180,160,230,.4),rgba(140,120,200,.5)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.quin-promo-label { font-size: 13px; font-weight: 600; color: var(--quin-dark); }
+.quin-promo-label em { color: #C09050; font-style: normal; }
+.quin-promo-arrow { margin-left: auto; color: var(--text-light); font-size: 16px; }
+.quin-hero { margin: 10px 16px 0; border-radius: 20px; background: linear-gradient(155deg,#C2B8E8 0%,#9A8ACC 45%,#7060B8 100%); padding: 26px 22px 22px; position: relative; overflow: hidden; }
+.quin-hero-fan { position: absolute; right: -8px; bottom: -8px; opacity: .15; }
+.quin-hero-title { font-size: 20px; font-weight: 700; color: white; line-height: 1.3; margin-bottom: 5px; }
+.quin-hero-sub { font-size: 12px; color: rgba(255,255,255,.72); margin-bottom: 18px; }
+.quin-hero-btn { display: inline-flex; align-items: center; gap: 5px; padding: 10px 28px; border-radius: 24px; background: linear-gradient(135deg,#3D3090,#5A48B8); color: white; font-size: 13px; font-weight: 600; border: none; }
+.quin-section-label { font-size: 13px; font-weight: 600; color: var(--quin-dark); padding: 14px 22px 8px; }
+.quin-activity { margin: 0 16px; border-radius: 16px; background: linear-gradient(135deg,#CAC0EA,#B8A8DC); padding: 16px 18px; display: flex; align-items: center; gap: 10px; }
+.quin-activity-info { flex: 1; }
+.quin-activity-title { font-size: 17px; font-weight: 700; color: var(--quin-dark); margin-bottom: 3px; }
+.quin-activity-sub { font-size: 11px; color: var(--quin-purple); }
+.quin-scene { margin: 10px 16px 0; border-radius: 16px; background: linear-gradient(135deg,#CEC6EE,#BEB0E2); padding: 14px 18px; display: flex; align-items: center; gap: 10px; }
+.quin-scene-info { flex: 1; }
+.quin-scene-title { font-size: 17px; font-weight: 700; color: var(--quin-dark); margin-bottom: 3px; }
+.quin-scene-sub { font-size: 11px; color: var(--quin-purple); }
+
+/* ══ SCREEN 3: DETAIL PAGE ══ */
+#screen-detail { position: absolute; inset: 0; z-index: 40; background: var(--card-bg); opacity: 0; pointer-events: none; transition: opacity .28s ease .26s; overflow-y: auto; }
+#screen-detail.visible { opacity: 1; pointer-events: all; }
+#screen-detail::-webkit-scrollbar { display: none; }
+.detail-status { height: 44px; display: flex; align-items: flex-end; padding: 0 22px 6px; justify-content: space-between; }
+.detail-topbar { height: 46px; display: flex; align-items: center; justify-content: center; padding: 0 18px; position: relative; }
+.back-btn { position: absolute; left: 18px; display: flex; align-items: center; gap: 4px; background: none; border: none; cursor: pointer; font-size: 13px; color: var(--gold); font-weight: 500; font-family: 'DM Sans', sans-serif; }
+.back-btn svg { width: 13px; height: 13px; }
+.detail-pg-title { font-size: 13px; color: var(--text-mid); font-family: 'Cormorant Garamond', serif; letter-spacing: .06em; }
+.d-answer { font-family: 'Cormorant Garamond', serif; font-size: 76px; font-weight: 600; line-height: .88; text-align: center; padding: 8px 0 0; opacity: 0; transform: translateY(8px); transition: opacity .55s ease .15s, transform .55s ease .15s; }
+.d-answer.yes{color:var(--yes)} .d-answer.no{color:var(--no)} .d-answer.maybe{color:var(--maybe)}
+#screen-detail.visible .d-answer { opacity: 1; transform: translateY(0); }
+.d-card-wrap { margin: 22px auto 0; width: fit-content; display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: 0; transform: translateY(6px); transition: opacity .45s ease .35s, transform .45s ease .35s; }
+#screen-detail.visible .d-card-wrap { opacity: 1; transform: translateY(0); }
+.d-big-card { width: 128px; height: 204px; border-radius: 14px; background: var(--card-bg); border: 1px solid var(--card-border); box-shadow: 0 8px 28px rgba(28,26,46,.12); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.d-card-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: var(--text-dark); }
+.d-pos-chip { padding: 3px 12px; border-radius: 16px; background: rgba(192,144,80,.1); font-size: 11px; color: var(--gold); font-weight: 500; }
+.d-divider { margin: 18px 22px; border: none; border-top: 1px solid var(--card-border); }
+.d-meaning { padding: 0 22px 40px; opacity: 0; transition: opacity .4s ease .48s; }
+#screen-detail.visible .d-meaning { opacity: 1; }
+.d-meaning-label { font-size: 10px; color: var(--text-light); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 8px; }
+.d-meaning-text { font-size: 13.5px; color: var(--text-mid); line-height: 1.8; }
+.note { max-width: 320px; text-align: center; font-size: 11px; color: var(--text-light); line-height: 1.7; }
+</style>
+</head>
+<body>
+
+<p class="pg-label">Quin · 快速决策 · Widget → 详情页</p>
+<div class="picker">
+  <button class="pk on" onclick="setResult('yes',this)">Yes</button>
+  <button class="pk"    onclick="setResult('no',this)">No</button>
+  <button class="pk"    onclick="setResult('maybe',this)">Maybe</button>
+</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <!-- ══ DESKTOP ══ -->
+  <div id="screen-home">
+    <div class="wallpaper"></div>
+    <div class="status-bar">
+      <span class="s-time">9:41</span>
+      <div class="s-icons">
+        <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="2" height="6" rx=".5" fill="#1C1A2E"/><rect x="4.5" y="2.5" width="2" height="7.5" rx=".5" fill="#1C1A2E"/><rect x="8" y="1" width="2" height="9" rx=".5" fill="#1C1A2E"/><rect x="11.5" y="3" width="2" height="7" rx=".5" fill="#1C1A2E" opacity=".3"/></svg>
+        <svg viewBox="0 0 20 14" fill="none"><rect x="1" y="1" width="16" height="12" rx="2.5" stroke="#1C1A2E" stroke-width="1.3"/><rect x="3" y="3" width="11" height="8" rx="1.2" fill="#1C1A2E"/></svg>
+      </div>
+    </div>
+    <div class="widget-wrap">
+      <div class="widget">
+        <div class="w-mini">快速决策</div>
+        <div class="w-left">
+          <div class="w-answer yes" id="w-answer">Yes</div>
+          <button class="w-cta yes" id="w-cta" onclick="startTransition()">展开来看</button>
+        </div>
+        <div class="w-right">
+          <div class="w-card"><div id="w-card-art"></div></div>
+          <div class="w-card-name" id="w-card-name">星星 · 正位</div>
+        </div>
+        <button class="w-reset">↺</button>
+      </div>
+    </div>
+    <div class="home-icons-row2">
+      <div class="app-icon"></div><div class="app-icon"></div><div class="app-icon"></div><div class="app-icon"></div>
+    </div>
+    <div class="home-icons">
+      <div class="app-icon"></div><div class="app-icon"></div><div class="app-icon"></div><div class="app-icon"></div>
+    </div>
+    <div class="dock">
+      <div class="dock-icon"></div>
+      <div class="dock-icon"></div>
+      <div class="dock-icon quin"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 3 L13 8.5 L10 14 L7 8.5Z" stroke="white" stroke-width="1.2" fill="none"/><circle cx="10" cy="14" r="2.2" stroke="white" stroke-width="1.2" fill="none"/></svg></div>
+      <div class="dock-icon"></div>
+    </div>
+  </div>
+
+  <!-- TRANSITION -->
+  <div id="t-overlay">
+    <div class="expand-rect" id="expand-rect"></div>
+  </div>
+
+  <!-- ══ QUIN APP HOME ══ -->
+  <div id="screen-app-home">
+    <div class="quin-status">
+      <span class="quin-s-time">09:44</span>
+      <div class="quin-s-right">
+        <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="0" y="3" width="2.5" height="8" rx=".4" fill="#1A1535"/><rect x="4" y="2" width="2.5" height="9" rx=".4" fill="#1A1535"/><rect x="8" y="0.5" width="2.5" height="10.5" rx=".4" fill="#1A1535"/><rect x="12" y="2" width="2.5" height="9" rx=".4" fill="#1A1535" opacity=".3"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 1 C4.1 1 0.9 3.2 0 6.5 C0.9 9.8 4.1 12 8 12 C11.9 12 15.1 9.8 16 6.5 C15.1 3.2 11.9 1 8 1Z" fill="#1A1535" opacity=".15"/><path d="M8 3.5 C5.5 3.5 3.4 4.8 2.5 6.5 C3.4 8.2 5.5 9.5 8 9.5 C10.5 9.5 12.6 8.2 13.5 6.5 C12.6 4.8 10.5 3.5 8 3.5Z" fill="#1A1535" opacity=".4"/><circle cx="8" cy="6.5" r="2" fill="#1A1535"/></svg>
+        <span style="font-size:12px;font-weight:700;">85</span>
+      </div>
+    </div>
+    <div class="quin-topbar">
+      <div class="quin-logo">Quin</div>
+      <div class="quin-topbar-icons">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#1A1535" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><polyline points="11,6.5 11,11 14,13.5"/></svg>
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#1A1535" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="8" r="3.5"/><path d="M4 19 C4 15.7 7.1 13 11 13 C14.9 13 18 15.7 18 19"/></svg>
+      </div>
+    </div>
+    <div class="quin-promo">
+      <div class="quin-promo-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="5" width="16" height="12" rx="2" fill="rgba(123,107,181,.35)" stroke="rgba(123,107,181,.5)" stroke-width="1"/><line x1="7" y1="9" x2="15" y2="9" stroke="rgba(123,107,181,.8)" stroke-width="1.2"/><line x1="7" y1="12" x2="12" y2="12" stroke="rgba(123,107,181,.8)" stroke-width="1.2"/></svg>
+      </div>
+      <div class="quin-promo-label">👉 点击领取 | <em>免费季会员</em></div>
+      <div class="quin-promo-arrow">›</div>
+    </div>
+    <div class="quin-hero">
+      <!-- fan lines -->
+      <svg class="quin-hero-fan" width="120" height="120" viewBox="0 0 120 120" fill="none">
+        <line x1="60" y1="120" x2="0" y2="28" stroke="white" stroke-width=".8"/>
+        <line x1="60" y1="120" x2="18" y2="12" stroke="white" stroke-width=".8"/>
+        <line x1="60" y1="120" x2="42" y2="4" stroke="white" stroke-width=".8"/>
+        <line x1="60" y1="120" x2="60" y2="0" stroke="white" stroke-width=".8"/>
+        <line x1="60" y1="120" x2="78" y2="4" stroke="white" stroke-width=".8"/>
+        <line x1="60" y1="120" x2="102" y2="12" stroke="white" stroke-width=".8"/>
+        <line x1="60" y1="120" x2="120" y2="28" stroke="white" stroke-width=".8"/>
+        <path d="M10 106 A68 68 0 0 1 110 106" stroke="white" stroke-width=".8" fill="none"/>
+        <path d="M24 92 A50 50 0 0 1 96 92" stroke="white" stroke-width=".8" fill="none"/>
+        <path d="M36 80 A36 36 0 0 1 84 80" stroke="white" stroke-width=".8" fill="none"/>
+      </svg>
+      <div class="quin-hero-title">宇宙在等待你提问</div>
+      <div class="quin-hero-sub">让塔罗指引你找到答案</div>
+      <div class="quin-hero-btn">✦ 开始占卜 ✦</div>
+    </div>
+    <div class="quin-section-label">限时活动</div>
+    <div class="quin-activity">
+      <div class="quin-activity-info">
+        <div class="quin-activity-title">2026 年度运势指引</div>
+        <div class="quin-activity-sub">用牌与文字，轻轻描出你一年的节奏</div>
+      </div>
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <rect x="6" y="16" width="32" height="42" rx="3.5" fill="white" opacity=".65" transform="rotate(-7 6 16)"/>
+        <rect x="12" y="12" width="32" height="42" rx="3.5" fill="white" opacity=".8" transform="rotate(-2 12 12)"/>
+        <rect x="14" y="14" width="32" height="42" rx="3.5" fill="white"/>
+        <line x1="20" y1="24" x2="40" y2="24" stroke="#C8B8E8" stroke-width="1.5"/>
+        <line x1="20" y1="30" x2="40" y2="30" stroke="#C8B8E8" stroke-width="1"/>
+        <line x1="20" y1="35" x2="34" y2="35" stroke="#C8B8E8" stroke-width="1"/>
+        <circle cx="48" cy="12" r="5" fill="#E85C8A"/>
+      </svg>
+    </div>
+    <div class="quin-section-label">场景占卜</div>
+    <div class="quin-scene">
+      <div class="quin-scene-info">
+        <div class="quin-scene-title">今日运势</div>
+        <div class="quin-scene-sub">获取今日来自宇宙的启示</div>
+      </div>
+      <svg width="58" height="58" viewBox="0 0 58 58" fill="none">
+        <rect x="8" y="4" width="34" height="50" rx="5" fill="#22194A" opacity=".9"/>
+        <circle cx="25" cy="22" r="8" stroke="rgba(180,155,230,.55)" stroke-width="1.2" fill="none"/>
+        <path d="M22 29 Q25 35 28 29" stroke="rgba(180,155,230,.45)" stroke-width="1" fill="none"/>
+        <circle cx="22" cy="20" r="1.5" fill="rgba(180,155,230,.7)"/>
+        <circle cx="28" cy="20" r="1.5" fill="rgba(180,155,230,.7)"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ══ DETAIL PAGE ══ -->
+  <div id="screen-detail">
+    <div class="detail-status">
+      <span class="s-time" style="color:var(--text-dark)">9:41</span>
+      <div class="s-icons">
+        <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="2" height="6" rx=".5" fill="#1C1A2E"/><rect x="4.5" y="2.5" width="2" height="7.5" rx=".5" fill="#1C1A2E"/><rect x="8" y="1" width="2" height="9" rx=".5" fill="#1C1A2E"/></svg>
+        <svg viewBox="0 0 20 14" fill="none"><rect x="1" y="1" width="16" height="12" rx="2.5" stroke="#1C1A2E" stroke-width="1.3"/><rect x="3" y="3" width="11" height="8" rx="1.2" fill="#1C1A2E"/></svg>
+      </div>
+    </div>
+    <div class="detail-topbar">
+      <button class="back-btn" onclick="goBack()">
+        <svg viewBox="0 0 14 14" fill="none"><path d="M9 2 L4 7 L9 12" stroke="#C09050" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        返回
+      </button>
+      <div class="detail-pg-title">快速决策</div>
+    </div>
+    <div style="text-align:center;padding:0 24px;">
+      <div class="d-answer yes" id="d-answer">Yes</div>
+    </div>
+    <div class="d-card-wrap">
+      <div class="d-big-card" id="d-big-card"></div>
+      <div class="d-card-name" id="d-card-name">星星</div>
+      <div class="d-pos-chip" id="d-pos-chip">正位</div>
+    </div>
+    <hr class="d-divider">
+    <div class="d-meaning">
+      <div class="d-meaning-label">牌意解读</div>
+      <div class="d-meaning-text" id="d-meaning-text"></div>
+    </div>
+  </div>
+  <!-- ══ ANNOTATION OVERLAY (topmost, pointer-events none) ══ -->
+  <div id="annotations" style="position:absolute;inset:0;z-index:300;pointer-events:none;">
+    <!-- ① CTA button on widget — shown when desktop is visible -->
+    <div id="ann-cta" style="display:none;">
+      <!-- dashed border around CTA -->
+      <div class="click-zone" style="top:147px;left:30px;width:108px;height:26px;border-radius:14px;"></div>
+      <!-- label above -->
+      <div class="click-label" style="top:134px;left:30px;">① 唯一触发点</div>
+    </div>
+    <!-- ② Back button on detail page — shown when detail is visible -->
+    <div id="ann-back" style="display:none;">
+      <div class="click-zone" style="top:52px;left:12px;width:58px;height:26px;border-radius:10px;"></div>
+      <div class="click-label" style="top:39px;left:12px;">② 返回 App 首页</div>
+    </div>
+  </div>
+</div>
+  <div class="legend-dash"></div>
+  可点击区域标注
+</div>
+<p class="note">① 桌面小组件：只有「展开来看」可触发跳转，直达详情页<br>② 详情页：「返回」回到 Quin App 首页（首页本身不可交互）</p>
+
+<script>
+const delay = ms => new Promise(r => setTimeout(r, ms));
+const $ = id => document.getElementById(id);
+
+const CARDS = {
+  yes:   { answerText:'Yes',   cls:'yes',   cardName:'星星', cardFull:'星星 · 正位', pos:'正位',  meaning:'充满希望的能量正在汇聚，宇宙给出了肯定的答案。相信自己的直觉，此刻是前进的好时机。内心的愿望与现实的走向正在对齐，保持敞开的心态，美好正在途中。', art:(w,h)=>`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><circle cx="${w/2}" cy="${h*.4}" r="${w*.28}" stroke="#C09050" stroke-width="1.2"/><line x1="${w/2}" y1="${h*.08}" x2="${w/2}" y2="${h*.72}" stroke="#C09050" stroke-width=".8" opacity=".35"/><line x1="${w*.08}" y1="${h*.4}" x2="${w*.92}" y2="${h*.4}" stroke="#C09050" stroke-width=".8" opacity=".35"/><line x1="${w*.2}" y1="${h*.18}" x2="${w*.8}" y2="${h*.62}" stroke="#C09050" stroke-width=".8" opacity=".35"/><line x1="${w*.8}" y1="${h*.18}" x2="${w*.2}" y2="${h*.62}" stroke="#C09050" stroke-width=".8" opacity=".35"/><circle cx="${w/2}" cy="${h*.4}" r="${w*.09}" fill="#C09050" opacity=".12"/><circle cx="${w/2}" cy="${h*.4}" r="${w*.055}" fill="#C09050" opacity=".55"/><circle cx="${w/2}" cy="${h*.4}" r="${w*.022}" fill="#C09050"/><text x="${w/2}" y="${h*.88}" text-anchor="middle" font-size="${w*.11}" fill="#A09CB0" font-family="DM Sans,sans-serif" letter-spacing=".06em">THE STAR</text></svg>` },
+  no:    { answerText:'No',    cls:'no',    cardName:'塔',   cardFull:'塔 · 逆位',   pos:'逆位',  meaning:'根基有所动摇，此路暂时不通。这不是终点，而是一个提醒——放慢脚步，重新审视方向。当风暴平息，你会以更清醒的姿态重新出发。', art:(w,h)=>`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><rect x="${w*.26}" y="${h*.14}" width="${w*.48}" height="${h*.42}" rx="2" stroke="#C09050" stroke-width="1.2"/><polygon points="${w*.26},${h*.14} ${w*.5},${h*.04} ${w*.74},${h*.14}" stroke="#C09050" stroke-width="1.2" fill="none"/><line x1="${w*.33}" y1="${h*.25}" x2="${w*.67}" y2="${h*.25}" stroke="#C09050" stroke-width=".8" opacity=".5"/><line x1="${w*.33}" y1="${h*.34}" x2="${w*.67}" y2="${h*.34}" stroke="#C09050" stroke-width=".8" opacity=".5"/><rect x="${w*.38}" y="${h*.44}" width="${w*.24}" height="${h*.12}" rx="1.5" stroke="#C09050" stroke-width=".9"/><text x="${w/2}" y="${h*.88}" text-anchor="middle" font-size="${w*.11}" fill="#A09CB0" font-family="DM Sans,sans-serif" letter-spacing=".06em">THE TOWER</text></svg>` },
+  maybe: { answerText:'Maybe', cls:'maybe', cardName:'月亮', cardFull:'月亮 · 正位', pos:'正位',  meaning:'迷雾尚未完全散去，答案需要时间沉淀。保持耐心，倾听内心深处的声音。当时机成熟，方向自然会清晰。此刻最好的行动，是等待与观察。', art:(w,h)=>`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><path d="M${w*.6} ${h*.07} A${w*.3} ${w*.3} 0 1 0 ${w*.6} ${h*.67} A${w*.18} ${w*.18} 0 1 1 ${w*.6} ${h*.07}Z" stroke="#C09050" stroke-width="1.2" fill="none"/><circle cx="${w*.27}" cy="${h*.62}" r="${w*.06}" stroke="#C09050" stroke-width=".9" fill="none"/><circle cx="${w*.46}" cy="${h*.68}" r="${w*.045}" stroke="#C09050" stroke-width=".9" fill="none"/><text x="${w/2}" y="${h*.88}" text-anchor="middle" font-size="${w*.11}" fill="#A09CB0" font-family="DM Sans,sans-serif" letter-spacing=".06em">THE MOON</text></svg>` }
+};
+
+let busy = false;
+
+function setResult(r, btn) {
+  document.querySelectorAll('.pk').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  const c = CARDS[r];
+  $('w-answer').textContent = c.answerText; $('w-answer').className = 'w-answer ' + c.cls;
+  $('w-cta').className = 'w-cta ' + c.cls;
+  $('w-card-art').innerHTML = c.art(38, 60); $('w-card-name').textContent = c.cardFull;
+  $('d-answer').textContent = c.answerText; $('d-answer').className = 'd-answer ' + c.cls;
+  $('d-big-card').innerHTML = c.art(96, 154);
+  $('d-card-name').textContent = c.cardName; $('d-pos-chip').textContent = c.pos;
+  $('d-meaning-text').textContent = c.meaning;
+  resetScreens();
+}
+
+function resetScreens() {
+  $('screen-home').style.opacity = '1'; $('screen-home').style.pointerEvents = 'all';
+  $('screen-app-home').classList.remove('visible');
+  $('screen-detail').classList.remove('visible');
+  $('t-overlay').style.opacity = '0'; $('t-overlay').classList.remove('active'); $('t-overlay').style.pointerEvents = 'none';
+  $('expand-rect').classList.remove('expanded');
+  $('ann-cta').style.display = 'block';
+  $('ann-back').style.display = 'none';
+  busy = false;
+}
+
+async function startTransition() {
+  if (busy) return; busy = true;
+  $('ann-cta').style.display = 'none';
+  const overlay=$('t-overlay'), rect=$('expand-rect'), home=$('screen-home'), detail=$('screen-detail');
+  overlay.classList.add('active'); overlay.style.opacity = '1';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ rect.classList.add('expanded'); }));
+  await delay(300);
+  detail.classList.add('visible');
+  await delay(320);
+  home.style.opacity = '0'; home.style.pointerEvents = 'none';
+  overlay.style.opacity = '0'; overlay.style.pointerEvents = 'none';
+  overlay.classList.remove('active'); rect.classList.remove('expanded');
+  $('ann-back').style.display = 'block';
+  busy = false;
+}
+
+function goBack() {
+  $('ann-back').style.display = 'none';
+  $('screen-detail').classList.remove('visible');
+  $('screen-app-home').classList.add('visible');
+}
+
+setResult('yes', document.querySelector('.pk.on'));
+</script>
+</body>
+</html>
