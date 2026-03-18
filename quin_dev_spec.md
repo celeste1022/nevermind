@@ -1,5 +1,5 @@
 # Quin Widget 开发规格文档
-## Yes or No? 桌面小组件 · 动效与交互说明
+## 快速决策 桌面小组件 · 动效与交互说明
 
 ---
 
@@ -58,7 +58,7 @@
 | 2280 | 牌 · 翻牌第二阶段 | scaleX 0 → 1（展开）+ 高光扫过 | 280ms / cubicBezier(0, 0.85, 0.45, 1) | `withAnimation(.spring(response:0.5, dampingFraction:0.75)) { scaleX = 1 }` |
 | 3140 | 牌 | 向右滑动：x 134 → 224pt | 780ms / spring(response:0.6, dampingFraction:0.85) | `withAnimation(.spring(response:0.6, dampingFraction:0.85))` |
 | 3480 | 牌名标签 | opacity 0 → 1 | 380ms / easeOut | `.transition(.opacity)` |
-| 3640 | 小标题「Yes or No?」 | opacity 0 → 1 | 300ms / easeOut | `.transition(.opacity)` |
+| 3640 | 小标题「快速决策」 | opacity 0 → 1 | 300ms / easeOut | `.transition(.opacity)` |
 | 3980 | 答案大字（Yes/No/Maybe） | opacity 0 → 1，慢慢浮现 | 1100ms / cubicBezier(0.4, 0, 0.2, 1) | `.animation(.easeInOut(duration:1.1))` |
 | 5280 | 「展开来看」按钮 | opacity 0 → 1（答案完全显示后才出现） | 500ms / easeOut | `.transition(.opacity).animation(.easeOut(duration:0.5))` |
 | 5280 | ↺ 重置按钮 | opacity 0 → 1 | 300ms / easeOut | `.transition(.opacity)` |
