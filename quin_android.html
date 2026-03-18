@@ -51,12 +51,42 @@ body {
   background: rgba(63,168,118,.06);
   border: 1px solid rgba(63,168,118,.18);
   border-radius: 12px;
-  padding: 11px 16px;
+  padding: 14px 16px;
   font-size: 11px; color: var(--text-mid); line-height: 1.7;
 }
 .diff-note strong { color: var(--yes); font-weight: 600; }
 .diff-note .row { display:flex; gap:8px; align-items:baseline; margin-top:4px; }
 .diff-note .icon { font-size:12px; flex-shrink:0; }
+.spec-title {
+  font-size: 10px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--text-dark);
+  margin-top: 6px; margin-bottom: 6px;
+}
+.spec-row { margin-bottom: 4px; }
+.spec-note {
+  margin-top: 6px; font-size: 10px; color: var(--text-light);
+  font-style: italic;
+}
+.spec-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 10.5px; margin-bottom: 4px;
+}
+.spec-table th {
+  text-align: left; padding: 4px 6px;
+  background: rgba(63,168,118,.07);
+  color: var(--text-dark); font-weight: 600;
+  border-bottom: 1px solid rgba(63,168,118,.15);
+}
+.spec-table td {
+  padding: 5px 6px; vertical-align: top;
+  border-bottom: 1px solid rgba(63,168,118,.07);
+  color: var(--text-mid);
+}
+.spec-table code {
+  background: rgba(63,168,118,.1); border-radius: 3px;
+  padding: 1px 4px; font-size: 9.5px; color: #2d8a60;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
 
 /* ══ WIDGET ══ */
 .widget {
@@ -259,13 +289,7 @@ body {
 </div>
 
 <div class="diff-note">
-  <strong>Android 实现差异</strong>
-  <div class="row"><span class="icon">✕</span><span>牌被「抽出」的弹性动画 → 去掉，RemoteViews 无法驱动复杂 keyframe</span></div>
-  <div class="row"><span class="icon">✕</span><span>3D 翻牌 → 去掉，改为初始态淡出 → Loading → 结果态淡入</span></div>
-  <div class="row"><span class="icon">✕</span><span>答案逐字揭晓 → 去掉，结果态整体同时出现（crossfade）</span></div>
-  <div class="row"><span class="icon">✕</span><span>Loading 旋转：用系统 ProgressBar（圆圈），无法自定义颜色弧线</span></div>
-  <div class="row"><span class="icon">✓</span><span>三态切换（初始→Loading→结果）：Glance + WorkManager 可实现</span></div>
-  <div class="row"><span class="icon">✓</span><span>点击 → 触发 Action → 更新 RemoteViews：API 26+ 支持</span></div>
+  Android 版本精简为三态直接切换：初始态（静态牌轮）→ Loading（居中旋转圈）→ 完成态（牌面 + 答案同时淡入），全程无牌面位移或翻转动画。三态之间均为 250ms 线性 crossfade，符合 RemoteViews 动画限制。
 </div>
 
 <div class="controls">
@@ -275,7 +299,7 @@ body {
   <button class="cb" id="cb-no"         onclick="jumpTo('no',this)">完成 · No</button>
   <button class="cb" id="cb-maybe"      onclick="jumpTo('maybe',this)">完成 · Maybe</button>
 </div>
-<p class="hint">点击小组件体验 Android 近似流程<br>无牌面动画，三态直接 crossfade 切换</p>
+<p class="hint">点击小组件体验 Android 近似流程 · 三态 crossfade 切换</p>
 
 <script>
 const delay = ms => new Promise(r => setTimeout(r, ms));

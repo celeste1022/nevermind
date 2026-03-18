@@ -51,10 +51,40 @@ body {
   background: rgba(192,144,80,.08);
   border: 1px solid rgba(192,144,80,.2);
   border-radius: 12px;
-  padding: 11px 16px;
+  padding: 14px 16px;
   font-size: 11px; color: var(--text-mid); line-height: 1.7;
 }
 .diff-note strong { color: var(--gold); font-weight: 600; }
+.spec-title {
+  font-size: 10px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--text-dark);
+  margin-top: 6px; margin-bottom: 6px;
+}
+.spec-row { margin-bottom: 4px; }
+.spec-note {
+  margin-top: 6px; font-size: 10px; color: var(--text-light);
+  font-style: italic;
+}
+.spec-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 10.5px; margin-bottom: 4px;
+}
+.spec-table th {
+  text-align: left; padding: 4px 6px;
+  background: rgba(192,144,80,.07);
+  color: var(--text-dark); font-weight: 600;
+  border-bottom: 1px solid rgba(192,144,80,.15);
+}
+.spec-table td {
+  padding: 5px 6px; vertical-align: top;
+  border-bottom: 1px solid rgba(192,144,80,.08);
+  color: var(--text-mid);
+}
+.spec-table code {
+  background: rgba(192,144,80,.1); border-radius: 3px;
+  padding: 1px 4px; font-size: 9.5px; color: var(--gold);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
 
 /* ══ WIDGET ══ */
 .widget {
@@ -334,10 +364,7 @@ body {
 </div>
 
 <div class="diff-note">
-  <strong>与原版唯一区别：</strong>翻牌动画<br>
-  原版：CSS rotateY 3D 透视翻转（WidgetKit 不支持）<br>
-  iOS 实现：scaleX 压缩至 0 → 换内容 → 弹性展开，配合高光扫过模拟翻面质感<br>
-  SwiftUI 对应：<code style="font-size:10px;color:var(--gold)">withAnimation(.spring(response:0.5))</code> + ZStack content swap
+  整体动效分为六个阶段：文字左退 + 牌轮淡出 → 一张牌从牌轮位置弹出（上浮后落定）→ 滑至中央 → Loading → 2D 压缩模拟翻牌（替代 WidgetKit 不支持的 3D rotateY）→ 牌滑至右侧，答案从左侧缓缓浮现。重置时牌面金光一闪后收缩消失，牌轮从中心向外绽开复原。
 </div>
 
 <div class="controls">
