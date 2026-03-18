@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quin · Widget · Android 近似方案</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #F2EEE7;
+  --widget-bg: #FFFFFF;
+  --text-dark: #1C1A2E;
+  --text-mid: #6B6680;
+  --text-light: #A09CB0;
+  --gold: #C09050;
+  --card-bg: #FBF8F2;
+  --card-border: #E4DDD0;
+  --yes: #3FA876;
+  --no: #CC5858;
+  --maybe: #7E62B8;
+  --shadow: 0 14px 44px rgba(28,26,46,.15), 0 2px 8px rgba(28,26,46,.07);
+  --radius: 22px;
+}
+
+body {
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-family: 'DM Sans', sans-serif;
+  gap: 24px; padding: 48px 24px;
+}
+
+.pg-header { text-align: center; }
+.pg-title { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:var(--text-dark); letter-spacing:.04em; }
+.pg-sub { font-size:11px; color:var(--text-light); letter-spacing:.12em; text-transform:uppercase; margin-top:4px; }
+
+.platform-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 14px; border-radius:20px;
+  background:rgba(63,168,118,.1);
+  font-size:11px; font-weight:600; color:var(--yes);
+  letter-spacing:.04em; margin-bottom:4px;
+}
+.platform-badge .dot { width:7px; height:7px; border-radius:50%; background:var(--yes); }
+
+.diff-note {
+  max-width: 329px;
+  background: rgba(63,168,118,.06);
+  border: 1px solid rgba(63,168,118,.18);
+  border-radius: 12px;
+  padding: 11px 16px;
+  font-size: 11px; color: var(--text-mid); line-height: 1.7;
+}
+.diff-note strong { color: var(--yes); font-weight: 600; }
+.diff-note .row { display:flex; gap:8px; align-items:baseline; margin-top:4px; }
+.diff-note .icon { font-size:12px; flex-shrink:0; }
+
+/* ══ WIDGET ══ */
+.widget {
+  width: 329px; height: 155px;
+  background: var(--widget-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  position: relative; overflow: hidden;
+  cursor: pointer; user-select: none;
+}
+.widget:active { transform: scale(.985); }
+
+/*
+  Android RemoteViews animation support (API 31+):
+  - Only supports: alpha, translationX/Y, scaleX/Y via AnimatorSet
+  - No perspective, no rotateY, no spring curves
+  - Transitions between RemoteViews states use simple crossfade
+  - Each "state" below maps to a separate RemoteViews layout
+*/
+
+/* ── STATE: Initial ── */
+#s-initial {
+  position:absolute; inset:0;
+  display:flex; align-items:center;
+  transition: opacity .25s linear; /* Android: linear interpolator only */
+}
+.left-panel {
+  padding: 0 0 0 22px;
+  display:flex; flex-direction:column; justify-content:center; gap:8px;
+  width:170px;
+}
+.init-title { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:600; color:var(--text-dark); line-height:1; }
+.init-sub   { font-size:10.5px; color:var(--text-mid); line-height:1.65; font-weight:300; }
+.fan-area {
+  flex:1; display:flex; align-items:center; justify-content:center;
+}
+.card-fan { position:relative; width:90px; height:118px; }
+.fan-card {
+  position:absolute; width:55px; height:86px; border-radius:7px;
+  background:var(--card-bg); border:1px solid var(--card-border);
+  transform-origin:50% 100%; left:50%; bottom:2px; margin-left:-27.5px;
+  box-shadow:0 2px 8px rgba(28,26,46,.08); overflow:hidden;
+}
+.fan-card::after {
+  content:''; position:absolute; inset:5px;
+  border:1px solid var(--card-border); border-radius:4px;
+  background:
+    repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(192,144,80,.06) 3px,rgba(192,144,80,.06) 4px),
+    repeating-linear-gradient(-45deg,transparent,transparent 3px,rgba(192,144,80,.04) 3px,rgba(192,144,80,.04) 4px);
+}
+.fc1{transform:rotate(-24deg);z-index:1} .fc2{transform:rotate(-12deg);z-index:2}
+.fc3{transform:rotate(0deg);z-index:3}   .fc4{transform:rotate(12deg);z-index:2}
+.fc5{transform:rotate(24deg);z-index:1}
+
+/* Pulse — Android supports ValueAnimator on alpha for simple loop */
+.pulse {
+  position:absolute; bottom:-4px; left:50%; transform:translateX(-50%);
+  width:64px; height:12px; border-radius:50%;
+  background:radial-gradient(ellipse,rgba(192,144,80,.22) 0%,transparent 70%);
+  animation: pulse 2.4s linear infinite; /* Android: linear only */
+}
+@keyframes pulse {
+  0%,100%{opacity:.3} 50%{opacity:.85}
+}
+
+/* ── STATE: Loading ── */
+#s-loading {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:12px;
+  opacity:0; pointer-events:none;
+  transition: opacity .25s linear;
+}
+/*
+  Android: loading spinner = ProgressBar (indeterminate) in RemoteViews.
+  Simple circular ring, no custom path animation.
+  Text: static TextView, no per-character animation.
+*/
+.and-spinner {
+  width:36px; height:36px;
+  border:2.5px solid var(--card-border);
+  border-top-color: var(--gold);
+  border-radius:50%;
+  animation: spin .9s linear infinite; /* linear = Android default */
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.load-text { font-size:11.5px; color:var(--text-mid); letter-spacing:.06em; }
+
+/* ── STATE: Done ── */
+#s-done {
+  position:absolute; inset:0;
+  display:flex; align-items:center;
+  opacity:0; pointer-events:none;
+  transition: opacity .3s linear;
+}
+/*
+  Android done layout: static RemoteViews with two columns.
+  Left: answer text + button. Right: card image + name.
+  All content set via setTextViewText / setImageViewBitmap.
+  No staggered reveals — everything appears simultaneously on crossfade-in.
+*/
+.done-left {
+  padding: 0 0 0 18px;
+  display:flex; flex-direction:column; justify-content:center; gap:7px;
+  width:196px;
+}
+.done-mini { font-family:'Cormorant Garamond',serif; font-size:10.5px; color:var(--text-light); letter-spacing:.06em; }
+.done-answer {
+  font-family:'Cormorant Garamond',serif; font-size:62px; font-weight:600; line-height:.92;
+}
+.done-answer.yes{color:var(--yes)} .done-answer.no{color:var(--no)} .done-answer.maybe{color:var(--maybe)}
+.done-cta {
+  display:inline-flex; align-items:center;
+  padding:6px 14px; border-radius:24px; font-size:11px; font-weight:500;
+  border:none; cursor:pointer; width:fit-content; color:white;
+  font-family:'DM Sans',sans-serif; transition:transform .1s;
+}
+.done-cta:active { transform:scale(.96); }
+.done-cta.yes{background:var(--yes)} .done-cta.no{background:var(--no)} .done-cta.maybe{background:var(--maybe)}
+.done-right {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:5px;
+}
+.done-card {
+  width:62px; height:98px; border-radius:8px;
+  background:var(--card-bg); border:1px solid var(--card-border);
+  box-shadow:0 4px 14px rgba(28,26,46,.1);
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+.done-card-name { font-size:9px; color:var(--text-light); text-align:center; line-height:1.4; }
+
+/* Reset button */
+#reset-btn {
+  position:absolute; top:10px; right:10px;
+  width:26px; height:26px; border-radius:50%;
+  background:rgba(160,156,176,.12); border:none; cursor:pointer; z-index:30;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; color:var(--text-mid);
+  opacity:0; pointer-events:none; transition:opacity .25s linear, background .15s;
+}
+#reset-btn:hover { background:rgba(160,156,176,.22); }
+
+/* Controls */
+.controls { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+.cb {
+  padding:7px 16px; border-radius:24px; border:1.5px solid #D6D0C8;
+  background:transparent; font-size:12px; color:var(--text-mid);
+  cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .15s;
+}
+.cb:hover:not(.on){border-color:var(--text-dark);color:var(--text-dark)}
+.cb.on{background:var(--text-dark);color:#fff;border-color:var(--text-dark)}
+.hint { font-size:11px; color:var(--text-light); text-align:center; max-width:329px; line-height:1.7; }
+</style>
+</head>
+<body>
+
+<div class="pg-header">
+  <div class="platform-badge"><div class="dot"></div>Android Glance 近似方案</div>
+  <div class="pg-title">Quin · Yes or No?</div>
+  <div class="pg-sub">点击 → Loading → 结果直接切入</div>
+</div>
+
+<div class="widget" id="widget">
+
+  <!-- STATE 1: Initial -->
+  <div id="s-initial">
+    <div class="left-panel">
+      <div class="init-title">Yes or No?</div>
+      <div class="init-sub">默念心中之问<br>轻触牌轮，聆听命运</div>
+    </div>
+    <div class="fan-area">
+      <div class="card-fan">
+        <div class="fan-card fc1"></div><div class="fan-card fc2"></div>
+        <div class="fan-card fc3"></div><div class="fan-card fc4"></div>
+        <div class="fan-card fc5"></div><div class="pulse"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATE 2: Loading -->
+  <div id="s-loading">
+    <div class="and-spinner"></div>
+    <div class="load-text">能量感应中……</div>
+  </div>
+
+  <!-- STATE 3: Done (populated by JS) -->
+  <div id="s-done">
+    <div class="done-left">
+      <div class="done-mini">Yes or No?</div>
+      <div class="done-answer" id="done-answer"></div>
+      <button class="done-cta" id="done-cta" onclick="event.stopPropagation()">展开来看</button>
+    </div>
+    <div class="done-right">
+      <div class="done-card" id="done-card"></div>
+      <div class="done-card-name" id="done-card-name"></div>
+    </div>
+  </div>
+
+  <button id="reset-btn" onclick="event.stopPropagation();doReset()">↺</button>
+</div>
+
+<div class="diff-note">
+  <strong>Android 实现差异</strong>
+  <div class="row"><span class="icon">✕</span><span>牌被「抽出」的弹性动画 → 去掉，RemoteViews 无法驱动复杂 keyframe</span></div>
+  <div class="row"><span class="icon">✕</span><span>3D 翻牌 → 去掉，改为初始态淡出 → Loading → 结果态淡入</span></div>
+  <div class="row"><span class="icon">✕</span><span>答案逐字揭晓 → 去掉，结果态整体同时出现（crossfade）</span></div>
+  <div class="row"><span class="icon">✕</span><span>Loading 旋转：用系统 ProgressBar（圆圈），无法自定义颜色弧线</span></div>
+  <div class="row"><span class="icon">✓</span><span>三态切换（初始→Loading→结果）：Glance + WorkManager 可实现</span></div>
+  <div class="row"><span class="icon">✓</span><span>点击 → 触发 Action → 更新 RemoteViews：API 26+ 支持</span></div>
+</div>
+
+<div class="controls">
+  <button class="cb on" id="cb-initial" onclick="jumpTo('initial',this)">初始态</button>
+  <button class="cb" id="cb-loading"    onclick="jumpTo('loading',this)">Loading</button>
+  <button class="cb" id="cb-yes"        onclick="jumpTo('yes',this)">完成 · Yes</button>
+  <button class="cb" id="cb-no"         onclick="jumpTo('no',this)">完成 · No</button>
+  <button class="cb" id="cb-maybe"      onclick="jumpTo('maybe',this)">完成 · Maybe</button>
+</div>
+<p class="hint">点击小组件体验 Android 近似流程<br>无牌面动画，三态直接 crossfade 切换</p>
+
+<script>
+const delay = ms => new Promise(r => setTimeout(r, ms));
+const $ = id => document.getElementById(id);
+
+const CARDS = {
+  yes:   { name:'星星 · 正位', cls:'yes',   art: starSVG   },
+  no:    { name:'塔 · 逆位',   cls:'no',    art: towerSVG  },
+  maybe: { name:'月亮 · 正位', cls:'maybe', art: moonSVG   },
+};
+
+function starSVG(w,h){return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><circle cx="${w/2}" cy="${h*.42}" r="${w*.3}" stroke="#C09050" stroke-width="1.2"/><line x1="${w/2}" y1="${h*.08}" x2="${w/2}" y2="${h*.76}" stroke="#C09050" stroke-width=".8" opacity=".35"/><line x1="${w*.08}" y1="${h*.42}" x2="${w*.92}" y2="${h*.42}" stroke="#C09050" stroke-width=".8" opacity=".35"/><line x1="${w*.2}" y1="${h*.2}" x2="${w*.8}" y2="${h*.64}" stroke="#C09050" stroke-width=".8" opacity=".35"/><line x1="${w*.8}" y1="${h*.2}" x2="${w*.2}" y2="${h*.64}" stroke="#C09050" stroke-width=".8" opacity=".35"/><circle cx="${w/2}" cy="${h*.42}" r="${w*.1}" fill="#C09050" opacity=".12"/><circle cx="${w/2}" cy="${h*.42}" r="${w*.06}" fill="#C09050" opacity=".55"/><circle cx="${w/2}" cy="${h*.42}" r="${w*.025}" fill="#C09050"/><text x="${w/2}" y="${h*.88}" text-anchor="middle" font-size="${w*.13}" fill="#A09CB0" font-family="DM Sans,sans-serif" letter-spacing=".06em">THE STAR</text></svg>`;}
+function towerSVG(w,h){return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><rect x="${w*.28}" y="${h*.16}" width="${w*.44}" height="${h*.4}" rx="1.5" stroke="#C09050" stroke-width="1.2"/><polygon points="${w*.28},${h*.16} ${w*.5},${h*.05} ${w*.72},${h*.16}" stroke="#C09050" stroke-width="1.2" fill="none"/><line x1="${w*.35}" y1="${h*.27}" x2="${w*.65}" y2="${h*.27}" stroke="#C09050" stroke-width=".8" opacity=".5"/><line x1="${w*.35}" y1="${h*.36}" x2="${w*.65}" y2="${h*.36}" stroke="#C09050" stroke-width=".8" opacity=".5"/><rect x="${w*.38}" y="${h*.46}" width="${w*.24}" height="${h*.1}" rx="1" stroke="#C09050" stroke-width=".9"/><text x="${w/2}" y="${h*.88}" text-anchor="middle" font-size="${w*.13}" fill="#A09CB0" font-family="DM Sans,sans-serif" letter-spacing=".06em">THE TOWER</text></svg>`;}
+function moonSVG(w,h){return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><path d="M${w*.6} ${h*.08} A${w*.32} ${w*.32} 0 1 0 ${w*.6} ${h*.72} A${w*.19} ${w*.19} 0 1 1 ${w*.6} ${h*.08}Z" stroke="#C09050" stroke-width="1.2" fill="none"/><circle cx="${w*.28}" cy="${h*.65}" r="${w*.065}" stroke="#C09050" stroke-width=".9" fill="none"/><circle cx="${w*.48}" cy="${h*.71}" r="${w*.048}" stroke="#C09050" stroke-width=".9" fill="none"/><text x="${w/2}" y="${h*.88}" text-anchor="middle" font-size="${w*.13}" fill="#A09CB0" font-family="DM Sans,sans-serif" letter-spacing=".06em">THE MOON</text></svg>`;}
+
+let currentState = 'initial', busy = false;
+const sInit = $('s-initial'), sLoad = $('s-loading'), sDone = $('s-done');
+const doneAnswer = $('done-answer'), doneCta = $('done-cta');
+const doneCard = $('done-card'), doneCardName = $('done-card-name');
+const resetBtn = $('reset-btn');
+
+// Crossfade helper — matches Android's alpha transition
+function crossfadeTo(target) {
+  [sInit, sLoad, sDone].forEach(el => {
+    el.style.opacity = '0';
+    el.style.pointerEvents = 'none';
+  });
+  target.style.opacity = '1';
+  target.style.pointerEvents = 'all';
+}
+
+$('widget').addEventListener('click', () => {
+  if (currentState !== 'initial' || busy) return;
+  const picks = ['yes','no','maybe'];
+  runReveal(picks[Math.floor(Math.random()*3)]);
+});
+
+async function runReveal(result) {
+  busy = true; currentState = 'loading';
+  const card = CARDS[result];
+
+  // State 1 → State 2: crossfade to loading
+  crossfadeTo(sLoad);
+  await delay(1200); // Android WorkManager fetch latency simulation
+
+  // Populate done state before fading in
+  doneAnswer.textContent = result === 'yes' ? 'Yes' : result === 'no' ? 'No' : 'Maybe';
+  doneAnswer.className = 'done-answer ' + card.cls;
+  doneCta.className = 'done-cta ' + card.cls;
+  doneCard.innerHTML = card.art(46, 72);
+  doneCardName.textContent = card.name;
+
+  // State 2 → State 3: crossfade to result
+  crossfadeTo(sDone);
+  resetBtn.style.opacity = '1';
+  resetBtn.style.pointerEvents = 'all';
+
+  busy = false; currentState = 'done';
+  updateCBs('yes'); // approximate
+  updateCBs(result);
+}
+
+async function doReset() {
+  if (busy || currentState !== 'done') return;
+  busy = true;
+  resetBtn.style.opacity = '0'; resetBtn.style.pointerEvents = 'none';
+  crossfadeTo(sInit);
+  busy = false; currentState = 'initial'; updateCBs('initial');
+}
+
+function jumpTo(state, btn) {
+  if (busy) return;
+  resetBtn.style.opacity = '0'; resetBtn.style.pointerEvents = 'none';
+  if (state === 'initial') {
+    crossfadeTo(sInit); currentState = 'initial';
+  } else if (state === 'loading') {
+    crossfadeTo(sLoad); currentState = 'loading';
+  } else {
+    const card = CARDS[state];
+    doneAnswer.textContent = state==='yes'?'Yes':state==='no'?'No':'Maybe';
+    doneAnswer.className = 'done-answer '+card.cls;
+    doneCta.className = 'done-cta '+card.cls;
+    doneCard.innerHTML = card.art(46,72);
+    doneCardName.textContent = card.name;
+    crossfadeTo(sDone);
+    resetBtn.style.opacity = '1'; resetBtn.style.pointerEvents = 'all';
+    currentState = 'done';
+  }
+  updateCBs(state);
+}
+
+function updateCBs(state) {
+  document.querySelectorAll('.cb').forEach(b=>b.classList.remove('on'));
+  const m={initial:'cb-initial',loading:'cb-loading',yes:'cb-yes',no:'cb-no',maybe:'cb-maybe'};
+  if(m[state])$(m[state]).classList.add('on');
+}
+</script>
+</body>
+</html>
