@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quin · History</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #E8E4DC;
+  --text-dark: #1C1A2E; --text-mid: #6B6680; --text-light: #A09CB0;
+  --gold: #C09050; --card-bg: #FFFFFF; --card-border: #EAE5DC;
+  --yes: #3FA876; --no: #CC5858; --maybe: #7E62B8;
+  --shadow: 0 24px 60px rgba(28,26,46,.2), 0 4px 16px rgba(28,26,46,.08);
+  --phone-r: 44px;
+  /* Quin app */
+  --quin-bg: #EEE8F8; --quin-purple: #7B6BB5; --quin-dark: #1A1535;
+  /* Daily/calendar dark theme */
+  --cal-bg: #0E0C1E; --cal-card: #1C1A32; --cal-border: #2A2848;
+}
+
+body {
+  background: var(--bg); min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: 'DM Sans', sans-serif; gap: 20px; padding: 40px 24px;
+}
+.pg-label { font-size: 11px; color: var(--text-light); letter-spacing: .14em; text-transform: uppercase; }
+
+/* ── Phone ── */
+.phone {
+  width: 320px; height: 640px; border-radius: var(--phone-r);
+  box-shadow: var(--shadow); position: relative; overflow: hidden;
+  border: 1px solid rgba(255,255,255,.6);
+}
+.notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 110px; height: 30px; background: #1C1A2E; border-radius: 0 0 18px 18px; z-index: 500; }
+
+/* ── Screens ── */
+.screen { position: absolute; inset: 0; opacity: 0; pointer-events: none; overflow: hidden; transition: opacity .25s ease; }
+.screen.active { opacity: 1; pointer-events: all; }
+.screen::-webkit-scrollbar { display: none; }
+
+/* ══════════════════════════════════════
+   SCREEN 1 — QUIN APP HOME
+══════════════════════════════════════ */
+#s-home { background: var(--quin-bg); overflow-y: auto; }
+#s-home::-webkit-scrollbar { display: none; }
+
+.quin-status { height: 44px; display: flex; align-items: flex-end; padding: 0 22px 6px; justify-content: space-between; }
+.qs-time { font-size: 13px; font-weight: 700; color: var(--quin-dark); }
+.qs-right { display: flex; gap: 6px; align-items: center; font-size: 12px; font-weight: 700; color: var(--quin-dark); }
+
+.quin-topbar { padding: 2px 22px 10px; display: flex; align-items: center; justify-content: space-between; }
+/* Entry 2: Quin logo click = daily calendar */
+.quin-logo {
+  font-size: 30px; font-weight: 800; color: var(--quin-dark); letter-spacing: -.02em;
+  cursor: pointer; user-select: none;
+  transition: opacity .1s;
+}
+.quin-logo:active { opacity: .7; }
+.quin-topbar-icons { display: flex; gap: 16px; align-items: center; }
+/* Entry 1: clock icon = history */
+.quin-clock-btn { cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.quin-clock-btn:active { opacity: .7; }
+
+.quin-promo { margin: 0 16px; background: rgba(255,255,255,.65); border-radius: 14px; padding: 10px 16px; display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,.85); }
+.quin-promo-icon { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg,rgba(180,160,230,.4),rgba(140,120,200,.5)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.quin-promo-label { font-size: 13px; font-weight: 600; color: var(--quin-dark); }
+.quin-promo-label em { color: #C09050; font-style: normal; }
+.quin-promo-arrow { margin-left: auto; color: var(--text-light); font-size: 16px; }
+
+.quin-hero { margin: 10px 16px 0; border-radius: 20px; background: linear-gradient(155deg,#C2B8E8 0%,#9A8ACC 45%,#7060B8 100%); padding: 26px 22px 22px; position: relative; overflow: hidden; }
+.quin-hero-fan { position: absolute; right: -8px; bottom: -8px; opacity: .15; pointer-events: none; }
+.quin-hero-title { font-size: 20px; font-weight: 700; color: white; line-height: 1.3; margin-bottom: 5px; }
+.quin-hero-sub { font-size: 12px; color: rgba(255,255,255,.72); margin-bottom: 18px; }
+.quin-hero-btn { display: inline-flex; align-items: center; gap: 5px; padding: 10px 28px; border-radius: 24px; background: linear-gradient(135deg,#3D3090,#5A48B8); color: white; font-size: 13px; font-weight: 600; border: none; }
+
+.quin-section-label { font-size: 13px; font-weight: 600; color: var(--quin-dark); padding: 14px 22px 8px; }
+
+.quin-activity { margin: 0 16px; border-radius: 16px; background: linear-gradient(135deg,#CAC0EA,#B8A8DC); padding: 16px 18px; display: flex; align-items: center; gap: 10px; }
+.quin-activity-info { flex: 1; }
+.quin-activity-title { font-size: 17px; font-weight: 700; color: var(--quin-dark); margin-bottom: 3px; }
+.quin-activity-sub { font-size: 11px; color: var(--quin-purple); }
+
+.quin-scene { margin: 10px 16px 0; border-radius: 16px; background: linear-gradient(135deg,#CEC6EE,#BEB0E2); padding: 14px 18px; display: flex; align-items: center; gap: 10px; }
+.quin-scene-info { flex: 1; }
+.quin-scene-title { font-size: 17px; font-weight: 700; color: var(--quin-dark); margin-bottom: 3px; }
+.quin-scene-sub { font-size: 11px; color: var(--quin-purple); }
+
+/* ── Annotation layer ── */
+.ann-layer { position: absolute; inset: 0; pointer-events: none; z-index: 400; }
+.ann-box { position: absolute; border: 2px dashed rgba(255,180,0,.8); border-radius: 10px; }
+.ann-tag {
+  position: absolute; background: rgba(255,180,0,.92);
+  color: #1C1A2E; font-size: 8px; font-weight: 700;
+  padding: 2px 6px; border-radius: 5px; white-space: nowrap; letter-spacing: .02em;
+}
+
+/* ══════════════════════════════════════
+   SCREEN 2 — DAILY CALENDAR (DARK)
+══════════════════════════════════════ */
+#s-daily { background: var(--cal-bg); overflow-y: auto; }
+#s-daily::-webkit-scrollbar { display: none; }
+
+.cal-status { height: 44px; display: flex; align-items: flex-end; padding: 0 22px 6px; justify-content: space-between; }
+.cal-topbar { padding: 4px 22px 16px; display: flex; align-items: flex-end; justify-content: space-between; }
+.cal-date-big { font-size: 34px; font-weight: 800; color: white; letter-spacing: -.02em; }
+.cal-close { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.1); border: none; cursor: pointer; color: rgba(255,255,255,.6); font-size: 16px; display: flex; align-items: center; justify-content: center; }
+
+/* Week strip */
+.week-strip { display: flex; align-items: center; padding: 0 18px 14px; gap: 2px; }
+.week-day {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 7px 4px; border-radius: 12px;
+  cursor: pointer;
+}
+.week-day.active { background: var(--quin-purple); }
+.week-day .wd-label { font-size: 9px; color: rgba(255,255,255,.45); }
+.week-day .wd-num { font-size: 15px; font-weight: 700; color: rgba(255,255,255,.85); }
+.week-day.active .wd-label { color: rgba(255,255,255,.8); }
+.week-day.active .wd-num { color: white; }
+.week-day .wd-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--yes); }
+.week-day.no-dot .wd-dot { display: none; }
+.week-expand { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px; color: rgba(255,255,255,.4); font-size: 9px; cursor: pointer; }
+
+/* Today fortune card (dark) */
+.cal-fortune { margin: 0 16px; border-radius: 16px; background: var(--cal-card); border: 1px solid var(--cal-border); padding: 16px 16px 16px; display: flex; align-items: center; gap: 12px; position: relative; overflow: hidden; }
+.cal-fortune-info { flex: 1; }
+.cal-fortune-title { font-size: 15px; font-weight: 700; color: white; margin-bottom: 6px; }
+.cal-fortune-title span { color: rgba(255,255,255,.5); font-weight: 400; margin: 0 6px; }
+.cal-fortune-text { font-size: 11px; color: rgba(255,255,255,.55); line-height: 1.65; }
+.cal-fortune-img { width: 58px; height: 82px; border-radius: 8px; overflow: hidden; flex-shrink: 0; transform: rotate(5deg); box-shadow: 0 4px 14px rgba(0,0,0,.4); background: #2a2048; display: flex; align-items: center; justify-content: center; }
+
+/* Quick decision card — DARK version */
+.qd-card-dark {
+  margin: 10px 16px 0; border-radius: 16px;
+  background: var(--cal-card); border: 1px solid var(--cal-border);
+  padding: 16px 16px; display: flex; align-items: center; gap: 14px;
+  cursor: pointer; transition: background .15s;
+  position: relative; overflow: hidden;
+}
+.qd-card-dark:active { background: rgba(255,255,255,.06); }
+.qd-dark-info { flex: 1; }
+.qd-dark-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px; font-weight: 600; color: white; margin-bottom: 3px;
+}
+.qd-dark-label span { color: rgba(255,255,255,.45); font-weight: 400; margin: 0 4px; font-size: 13px; }
+.qd-dark-time { font-size: 10px; color: rgba(255,255,255,.35); margin-bottom: 8px; }
+.qd-dark-ans {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px; font-weight: 600; line-height: 1;
+}
+.qd-dark-ans.yes{color:var(--yes)} .qd-dark-ans.no{color:var(--no)} .qd-dark-ans.maybe{color:var(--maybe)}
+.qd-dark-img { width: 52px; height: 82px; border-radius: 8px; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 14px rgba(0,0,0,.4); background: #FBF8F2; border: 1px solid rgba(255,255,255,.1); display: flex; align-items: center; justify-content: center; }
+.qd-dark-arrow { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,.25); font-size: 16px; }
+
+/* ══════════════════════════════════════
+   SCREEN 3 — HISTORY LIST
+══════════════════════════════════════ */
+#s-history { background: #F2F0F8; }
+
+.hist-status { height: 44px; display: flex; align-items: flex-end; padding: 0 22px 6px; justify-content: space-between; }
+.hist-topbar { height: 54px; display: flex; align-items: center; padding: 0 20px; gap: 10px; }
+.hist-back { display: flex; align-items: center; gap: 4px; background: none; border: none; cursor: pointer; font-size: 15px; color: var(--text-dark); }
+.hist-page-title { font-size: 17px; font-weight: 600; color: var(--text-dark); }
+
+.hist-scroll { position: absolute; top: 98px; left: 0; right: 0; bottom: 0; overflow-y: auto; padding: 0 16px 24px; }
+.hist-scroll::-webkit-scrollbar { display: none; }
+
+.hist-date-sep { font-size: 12px; color: var(--text-light); text-align: center; padding: 12px 0 8px; }
+
+/* History record card — full width, from screenshot 1 */
+.hist-rec-card {
+  background: white; border-radius: 16px; padding: 16px;
+  margin-bottom: 10px; cursor: pointer;
+  box-shadow: 0 1px 6px rgba(28,26,46,.06);
+  transition: transform .1s;
+}
+.hist-rec-card:active { transform: scale(.98); }
+.hist-rec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.hist-rec-title { font-size: 16px; font-weight: 700; color: var(--text-dark); }
+.hist-rec-arrow { color: var(--text-light); font-size: 14px; }
+.hist-rec-time { font-size: 11px; color: var(--text-light); margin-bottom: 10px; }
+
+/* Quick decision card — LIGHT version (inside history) */
+.qd-card-light {
+  background: white; border-radius: 14px;
+  padding: 14px 14px; display: flex; align-items: center; gap: 14px;
+  border: 1px solid var(--card-border);
+  cursor: pointer; transition: background .12s;
+  box-shadow: 0 1px 6px rgba(28,26,46,.06);
+}
+.qd-card-light:active { background: #F8F6FF; }
+.qd-light-info { flex: 1; }
+.qd-light-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px; font-weight: 600; color: var(--quin-dark); margin-bottom: 2px;
+}
+.qd-light-label span { color: var(--text-light); font-weight: 400; margin: 0 4px; font-size: 13px; }
+.qd-light-time { font-size: 10px; color: var(--text-light); margin-bottom: 8px; }
+.qd-light-ans {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 34px; font-weight: 600; line-height: 1;
+}
+.qd-light-ans.yes{color:var(--yes)} .qd-light-ans.no{color:var(--no)} .qd-light-ans.maybe{color:var(--maybe)}
+.qd-light-img { width: 52px; height: 82px; border-radius: 8px; overflow: hidden; flex-shrink: 0; box-shadow: 0 2px 8px rgba(28,26,46,.08); background: #FBF8F2; border: 1px solid var(--card-border); display: flex; align-items: center; justify-content: center; }
+
+/* Other history cards (non-quick-decision) */
+.hist-other-card {
+  background: white; border-radius: 16px; padding: 16px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 6px rgba(28,26,46,.06);
+}
+.hist-other-title { font-size: 16px; font-weight: 700; color: var(--text-dark); margin-bottom: 3px; display: flex; justify-content: space-between; align-items: center; }
+.hist-other-time { font-size: 11px; color: var(--text-light); margin-bottom: 10px; }
+.hist-cards-row { display: flex; gap: 4px; overflow-x: auto; margin-bottom: 10px; }
+.hist-cards-row::-webkit-scrollbar { display: none; }
+.hist-card-thumb-sm { width: 42px; height: 58px; border-radius: 5px; background: #F5F0E8; border: 1px solid #E4DDD0; flex-shrink: 0; overflow: hidden; }
+.hist-summary { font-size: 12px; color: var(--text-mid); line-height: 1.6; }
+
+/* disabled label */
+.hist-disabled { text-align: center; font-size: 11px; color: var(--text-light); padding: 8px 0 4px; }
+
+/* ══════════════════════════════════════
+   SCREEN 4 — DETAIL PAGE
+══════════════════════════════════════ */
+#s-detail { background: #FBF8F2; overflow-y: auto; }
+#s-detail::-webkit-scrollbar { display: none; }
+
+.det-status { height: 44px; display: flex; align-items: flex-end; padding: 0 22px 6px; justify-content: space-between; }
+.det-topbar { height: 46px; display: flex; align-items: center; justify-content: center; padding: 0 18px; position: relative; }
+.det-back { position: absolute; left: 18px; display: flex; align-items: center; gap: 4px; background: none; border: none; cursor: pointer; font-size: 13px; color: var(--gold); font-weight: 500; font-family: 'DM Sans', sans-serif; }
+.det-back svg { width: 13px; height: 13px; }
+.det-title { font-size: 13px; color: var(--text-mid); font-family: 'Cormorant Garamond', serif; letter-spacing: .06em; }
+
+.det-answer { font-family: 'Cormorant Garamond', serif; font-size: 76px; font-weight: 600; line-height: .88; text-align: center; padding: 8px 0 0; }
+.det-answer.yes{color:var(--yes)} .det-answer.no{color:var(--no)} .det-answer.maybe{color:var(--maybe)}
+
+.det-card-wrap { margin: 22px auto 0; width: fit-content; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.det-big-card { width: 128px; height: 204px; border-radius: 14px; background: #FBF8F2; border: 1px solid var(--card-border); box-shadow: 0 8px 28px rgba(28,26,46,.12); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.det-card-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: var(--text-dark); }
+.det-pos-chip { padding: 3px 12px; border-radius: 16px; background: rgba(192,144,80,.1); font-size: 11px; color: var(--gold); font-weight: 500; }
+.det-divider { margin: 18px 22px; border: none; border-top: 1px solid var(--card-border); }
+.det-meaning { padding: 0 22px 40px; }
+.det-meaning-label { font-size: 10px; color: var(--text-light); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 8px; }
+.det-meaning-text { font-size: 13.5px; color: var(--text-mid); line-height: 1.8; }
+
+/* legend */
+.legend { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text-mid); padding: 6px 12px; background: rgba(255,255,255,.7); border-radius: 20px; border: 1px solid rgba(255,180,0,.35); }
+.legend-dash { width: 18px; border-top: 2px dashed rgba(255,180,0,.75); }
+.note { max-width: 320px; text-align: center; font-size: 11px; color: var(--text-light); line-height: 1.7; }
+</style>
+</head>
+<body>
+
+<p class="pg-label">Quin · 历史记录 · Two Entry Points</p>
+
+<div class="phone" id="phone">
+  <div class="notch"></div>
+
+  <!-- ══ SCREEN 1: QUIN APP HOME ══ -->
+  <div class="screen active" id="s-home">
+    <div class="quin-status">
+      <span class="qs-time">09:44</span>
+      <div class="qs-right">
+        <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="0" y="3" width="2.5" height="8" rx=".4" fill="#1A1535"/><rect x="4" y="2" width="2.5" height="9" rx=".4" fill="#1A1535"/><rect x="8" y=".5" width="2.5" height="10.5" rx=".4" fill="#1A1535"/><rect x="12" y="2" width="2.5" height="9" rx=".4" fill="#1A1535" opacity=".3"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><circle cx="8" cy="6.5" r="5.5" fill="#1A1535" opacity=".12"/><circle cx="8" cy="6.5" r="3" fill="#1A1535" opacity=".4"/><circle cx="8" cy="6.5" r="1.5" fill="#1A1535"/></svg>
+        <span style="font-size:12px;font-weight:700;">85</span>
+      </div>
+    </div>
+    <div class="quin-topbar">
+      <!-- 入口二: click Quin logo → daily calendar -->
+      <div class="quin-logo" onclick="showScreen('s-daily')">Quin</div>
+      <div class="quin-topbar-icons">
+        <!-- 入口一: clock → history list -->
+        <div class="quin-clock-btn" onclick="showScreen('s-history')">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#1A1535" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><polyline points="11,6.5 11,11 14,13.5"/></svg>
+        </div>
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#1A1535" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="8" r="3.5"/><path d="M4 19 C4 15.7 7.1 13 11 13 C14.9 13 18 15.7 18 19"/></svg>
+      </div>
+    </div>
+    <div class="quin-promo">
+      <div class="quin-promo-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="5" width="16" height="12" rx="2" fill="rgba(123,107,181,.35)" stroke="rgba(123,107,181,.5)" stroke-width="1"/><line x1="7" y1="9" x2="15" y2="9" stroke="rgba(123,107,181,.8)" stroke-width="1.2"/><line x1="7" y1="12" x2="12" y2="12" stroke="rgba(123,107,181,.8)" stroke-width="1.2"/></svg>
+      </div>
+      <div class="quin-promo-label">👉 点击领取 | <em>免费季会员</em></div>
+      <div class="quin-promo-arrow">›</div>
+    </div>
+    <div class="quin-hero" style="margin-top:10px;">
+      <svg class="quin-hero-fan" width="120" height="120" viewBox="0 0 120 120" fill="none">
+        <line x1="60" y1="120" x2="0" y2="28" stroke="white" stroke-width=".8"/>
+        <line x1="60" y1="120" x2="18" y2="12" stroke="white" stroke-width=".8"/>
+        <line x1="60" y1="120" x2="42" y2="4" stroke="white" stroke-width=".8"/>
+        <line x1="60" y1="120" x2="60" y2="0" stroke="white" stroke-width=".8"/>
+        <line x1="60" y1="120" x2="78" y2="4" stroke="white" stroke-width=".8"/>
+        <line x1="60" y1="120" x2="102" y2="12" stroke="white" stroke-width=".8"/>
+        <line x1="60" y1="120" x2="120" y2="28" stroke="white" stroke-width=".8"/>
+        <path d="M10 106 A68 68 0 0 1 110 106" stroke="white" stroke-width=".8" fill="none"/>
+        <path d="M24 92 A50 50 0 0 1 96 92" stroke="white" stroke-width=".8" fill="none"/>
+        <path d="M36 80 A36 36 0 0 1 84 80" stroke="white" stroke-width=".8" fill="none"/>
+      </svg>
+      <div class="quin-hero-title">宇宙在等待你提问</div>
+      <div class="quin-hero-sub">让塔罗指引你找到答案</div>
+      <div class="quin-hero-btn">✦ 开始占卜 ✦</div>
+    </div>
+    <div class="quin-section-label">限时活动</div>
+    <div class="quin-activity">
+      <div class="quin-activity-info">
+        <div class="quin-activity-title">2026 年度运势指引</div>
+        <div class="quin-activity-sub">用牌与文字，轻轻描出你一年的节奏</div>
+      </div>
+      <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+        <rect x="5" y="14" width="30" height="40" rx="3" fill="white" opacity=".6" transform="rotate(-7 5 14)"/>
+        <rect x="10" y="10" width="30" height="40" rx="3" fill="white" opacity=".8" transform="rotate(-2 10 10)"/>
+        <rect x="12" y="12" width="30" height="40" rx="3" fill="white"/>
+        <line x1="18" y1="22" x2="36" y2="22" stroke="#C8B8E8" stroke-width="1.4"/>
+        <line x1="18" y1="28" x2="36" y2="28" stroke="#C8B8E8" stroke-width="1"/>
+        <line x1="18" y1="33" x2="30" y2="33" stroke="#C8B8E8" stroke-width="1"/>
+        <circle cx="44" cy="10" r="5" fill="#E85C8A"/>
+      </svg>
+    </div>
+    <div class="quin-section-label">场景占卜</div>
+    <div class="quin-scene" style="margin-bottom:20px;">
+      <div class="quin-scene-info">
+        <div class="quin-scene-title">今日运势</div>
+        <div class="quin-scene-sub">获取今日来自宇宙的启示</div>
+      </div>
+      <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+        <rect x="8" y="4" width="32" height="48" rx="5" fill="#22194A" opacity=".9"/>
+        <circle cx="24" cy="20" r="7" stroke="rgba(180,155,230,.55)" stroke-width="1.2" fill="none"/>
+        <circle cx="22" cy="18" r="1.5" fill="rgba(180,155,230,.7)"/>
+        <circle cx="26" cy="18" r="1.5" fill="rgba(180,155,230,.7)"/>
+      </svg>
+    </div>
+
+    <!-- ── Annotation layer ── -->
+    <div class="ann-layer">
+      <!-- 入口一: clock icon — topbar right side, first of two icons -->
+      <div class="ann-box" style="top:50px;right:58px;width:26px;height:26px;border-radius:50%;"></div>
+      <div class="ann-tag" style="top:38px;right:36px;">入口一：历史记录</div>
+      <!-- 入口二: Quin logo -->
+      <div class="ann-box" style="top:48px;left:14px;width:62px;height:28px;border-radius:8px;"></div>
+      <div class="ann-tag" style="top:78px;left:14px;">入口二：每日记录（下滑）</div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 2: DAILY CALENDAR ══ -->
+  <div class="screen" id="s-daily">
+    <div class="cal-status">
+      <span style="font-size:13px;font-weight:700;color:white;">09:44</span>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="0" y="3" width="2.5" height="8" rx=".4" fill="white"/><rect x="4" y="2" width="2.5" height="9" rx=".4" fill="white"/><rect x="8" y=".5" width="2.5" height="10.5" rx=".4" fill="white"/><rect x="12" y="2" width="2.5" height="9" rx=".4" fill="white" opacity=".3"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><circle cx="8" cy="6.5" r="5.5" fill="white" opacity=".2"/><circle cx="8" cy="6.5" r="3" fill="white" opacity=".5"/><circle cx="8" cy="6.5" r="1.5" fill="white"/></svg>
+        <span style="font-size:12px;font-weight:700;color:white;">83</span>
+      </div>
+    </div>
+    <div class="cal-topbar">
+      <div class="cal-date-big">3月17日</div>
+      <button class="cal-close" onclick="showScreen('s-home')">✕</button>
+    </div>
+
+    <!-- Week strip -->
+    <div class="week-strip">
+      <div class="week-day no-dot"><div class="wd-label">周一</div><div class="wd-num">16</div><div class="wd-dot"></div></div>
+      <div class="week-day active"><div class="wd-label">周二</div><div class="wd-num">17</div><div class="wd-dot"></div></div>
+      <div class="week-day"><div class="wd-label">周三</div><div class="wd-num">18</div><div class="wd-dot"></div></div>
+      <div class="week-day no-dot"><div class="wd-label">周四</div><div class="wd-num">19</div><div class="wd-dot"></div></div>
+      <div class="week-day no-dot"><div class="wd-label">周五</div><div class="wd-num">20</div><div class="wd-dot"></div></div>
+      <div class="week-day no-dot"><div class="wd-label">周六</div><div class="wd-num">21</div><div class="wd-dot"></div></div>
+      <div class="week-day no-dot"><div class="wd-label">周日</div><div class="wd-num">22</div><div class="wd-dot"></div></div>
+      <div class="week-expand"><span>展开</span><span>⌄</span></div>
+    </div>
+
+    <!-- Today fortune card -->
+    <div class="cal-fortune">
+      <div class="cal-fortune-info">
+        <div class="cal-fortune-title">今日运势 <span>|</span> 宝剑四</div>
+        <div class="cal-fortune-text">正位的宝剑四代表休息、恢复和冥想，提醒你暂停脚步，恢复能量。</div>
+      </div>
+      <div class="cal-fortune-img">
+        <svg width="42" height="66" viewBox="0 0 42 66" fill="none">
+          <rect x="1" y="1" width="40" height="64" rx="4" fill="#1E1040"/>
+          <line x1="21" y1="8" x2="21" y2="52" stroke="rgba(180,155,230,.5)" stroke-width="1.2"/>
+          <line x1="8" y1="20" x2="34" y2="20" stroke="rgba(180,155,230,.4)" stroke-width="1"/>
+          <line x1="8" y1="30" x2="34" y2="30" stroke="rgba(180,155,230,.4)" stroke-width="1"/>
+          <line x1="8" y1="40" x2="34" y2="40" stroke="rgba(180,155,230,.4)" stroke-width="1"/>
+          <rect x="8" y="48" width="26" height="8" rx="2" fill="rgba(180,155,230,.15)" stroke="rgba(180,155,230,.3)" stroke-width=".8"/>
+          <text x="21" y="59" text-anchor="middle" font-size="4" fill="rgba(180,155,230,.5)" font-family="DM Sans">FOUR OF SWORDS</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- 快速决策 dark card -->
+    <div class="qd-card-dark" onclick="openDetail('daily-yes')">
+      <div class="qd-dark-info">
+        <div class="qd-dark-label">快速决策<span>｜</span>星星</div>
+        <div class="qd-dark-time">一分钟前</div>
+        <div class="qd-dark-ans yes">Yes</div>
+      </div>
+      <div class="qd-dark-img">
+        <svg width="38" height="60" viewBox="0 0 38 60" fill="none">
+          <circle cx="19" cy="22" r="8.5" stroke="#C09050" stroke-width="1"/>
+          <line x1="19" y1="9" x2="19" y2="35" stroke="#C09050" stroke-width=".75" opacity=".38"/>
+          <line x1="6" y1="22" x2="32" y2="22" stroke="#C09050" stroke-width=".75" opacity=".38"/>
+          <line x1="9" y1="12" x2="29" y2="32" stroke="#C09050" stroke-width=".75" opacity=".38"/>
+          <line x1="29" y1="12" x2="9" y2="32" stroke="#C09050" stroke-width=".75" opacity=".38"/>
+          <circle cx="19" cy="22" r="3" fill="#C09050" opacity=".55"/>
+          <circle cx="19" cy="22" r="1.2" fill="#FBF8F2"/>
+          <text x="19" y="50" text-anchor="middle" font-size="5.5" fill="#A09CB0" font-family="DM Sans">THE STAR</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Bottom tab bar hint -->
+    <div style="position:absolute;bottom:0;left:0;right:0;height:56px;background:rgba(20,18,36,.95);display:flex;align-items:center;justify-content:space-around;padding:0 32px;border-top:1px solid rgba(255,255,255,.06);">
+      <span style="font-size:18px;font-weight:800;color:rgba(255,255,255,.9);font-family:'DM Sans',sans-serif;letter-spacing:-.02em;">Quin</span>
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><polyline points="11,6.5 11,11 14,13.5"/></svg>
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="8" r="3.5"/><path d="M4 19 C4 15.7 7.1 13 11 13 C14.9 13 18 15.7 18 19"/></svg>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 3: HISTORY LIST ══ -->
+  <div class="screen" id="s-history">
+    <div class="hist-status">
+      <span style="font-size:13px;font-weight:600;color:var(--text-dark)">9:55</span>
+    </div>
+    <div class="hist-topbar">
+      <button class="hist-back" onclick="showScreen('s-home')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2 L4 7 L9 12" stroke="#1C1A2E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="hist-page-title">历史对话</div>
+    </div>
+    <div class="hist-scroll">
+      <div class="hist-date-sep">3月18日</div>
+
+      <!-- 快速决策 light card -->
+      <div class="qd-card-light" onclick="openDetail('hist-yes')" style="margin-bottom:10px;">
+        <div class="qd-light-info">
+          <div class="qd-light-label">快速决策<span>｜</span>星星</div>
+          <div class="qd-light-time">一分钟前</div>
+          <div class="qd-light-ans yes">Yes</div>
+        </div>
+        <div class="qd-light-img">
+          <svg width="38" height="60" viewBox="0 0 38 60" fill="none">
+            <circle cx="19" cy="22" r="8.5" stroke="#C09050" stroke-width="1"/>
+            <line x1="19" y1="9" x2="19" y2="35" stroke="#C09050" stroke-width=".75" opacity=".38"/>
+            <line x1="6" y1="22" x2="32" y2="22" stroke="#C09050" stroke-width=".75" opacity=".38"/>
+            <line x1="9" y1="12" x2="29" y2="32" stroke="#C09050" stroke-width=".75" opacity=".38"/>
+            <line x1="29" y1="12" x2="9" y2="32" stroke="#C09050" stroke-width=".75" opacity=".38"/>
+            <circle cx="19" cy="22" r="3" fill="#C09050" opacity=".55"/>
+            <circle cx="19" cy="22" r="1.2" fill="#FBF8F2"/>
+            <text x="19" y="50" text-anchor="middle" font-size="5.5" fill="#A09CB0" font-family="DM Sans">THE STAR</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="hist-date-sep">3月17日</div>
+
+      <!-- Regular history card -->
+      <div class="hist-other-card">
+        <div class="hist-other-title">我适合养什么样的小狗？<span style="color:var(--text-light);font-size:14px;">›</span></div>
+        <div class="hist-other-time">22小时前</div>
+        <div class="hist-cards-row">
+          <div class="hist-card-thumb-sm"></div><div class="hist-card-thumb-sm"></div>
+          <div class="hist-card-thumb-sm"></div><div class="hist-card-thumb-sm"></div>
+          <div class="hist-card-thumb-sm"></div><div class="hist-card-thumb-sm"></div>
+          <div class="hist-card-thumb-sm"></div>
+        </div>
+        <div class="hist-summary">星币一与权杖七预示稳定陪伴与坚韧情感纽带，但逆位命运之轮提醒避免冲动选择。权杖十强调训练需长期投入，逆位魔术师建议优先选择独立型犬…</div>
+      </div>
+
+      <div class="hist-date-sep">3月16日</div>
+      <div class="hist-disabled">- 以下占卜结果的对话功能已关闭 -</div>
+
+      <div class="hist-other-card">
+        <div class="hist-other-title">我要不要吃麦当劳<span style="color:var(--text-light);font-size:14px;">›</span></div>
+        <div class="hist-other-time">昨天</div>
+        <div class="hist-cards-row">
+          <div class="hist-card-thumb-sm"></div>
+        </div>
+        <div class="hist-summary">逆位权杖十暗示你正承受主观施加的负担，盲目选择快餐可能加剧疲惫。牌面强调需减轻压力而非透支能量，建议优先审视真实需求再行动。</div>
+      </div>
+
+      <div class="hist-other-card">
+        <div class="hist-other-title">我跟他下一次见面是什么时候呢？<span style="color:var(--text-light);font-size:14px;">›</span></div>
+        <div class="hist-other-time">昨天</div>
+        <div class="hist-cards-row">
+          <div class="hist-card-thumb-sm"></div><div class="hist-card-thumb-sm"></div>
+          <div class="hist-card-thumb-sm"></div><div class="hist-card-thumb-sm"></div>
+          <div class="hist-card-thumb-sm"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 4: DETAIL PAGE ══ -->
+  <div class="screen" id="s-detail">
+    <div class="det-status">
+      <span style="font-size:13px;font-weight:600;color:var(--text-dark)">9:41</span>
+      <div style="display:flex;gap:5px;">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="2" height="6" rx=".5" fill="#1C1A2E"/><rect x="4.5" y="2.5" width="2" height="7.5" rx=".5" fill="#1C1A2E"/><rect x="8" y="1" width="2" height="9" rx=".5" fill="#1C1A2E"/></svg>
+        <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><rect x="1" y="1" width="14" height="12" rx="2.5" stroke="#1C1A2E" stroke-width="1.2"/><rect x="2.5" y="2.5" width="10" height="9" rx="1.2" fill="#1C1A2E"/></svg>
+      </div>
+    </div>
+    <div class="det-topbar">
+      <button class="det-back" id="det-back-btn" onclick="goBackFromDetail()">
+        <svg viewBox="0 0 14 14" fill="none"><path d="M9 2 L4 7 L9 12" stroke="#C09050" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="det-back-label">返回</span>
+      </button>
+      <div class="det-title">快速决策</div>
+    </div>
+    <div id="det-body"><!-- filled by JS --></div>
+  </div>
+
+</div>
+
+<div class="legend"><div class="legend-dash"></div>可点击区域标注</div>
+<p class="note">入口一：右上角时钟图标 → 历史记录<br>入口二：点击「Quin」（代替下滑）→ 每日记录<br>卡片点击 → 详情页，返回到对应列表</p>
+
+<script>
+const $ = id => document.getElementById(id);
+let detailFrom = 'hist'; // 'hist' | 'daily'
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+
+const CARDS = {
+  yes:   { ans:'Yes',   cls:'yes',   card:'星星', pos:'正位', meaning:'充满希望的能量正在汇聚，宇宙给出了肯定的答案。相信自己的直觉，此刻是前进的好时机。内心的愿望与现实的走向正在对齐，保持敞开的心态，美好正在途中。',
+    art:(w,h)=>`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><circle cx="${w/2}" cy="${h*.4}" r="${w*.28}" stroke="#C09050" stroke-width="1.2"/><line x1="${w/2}" y1="${h*.08}" x2="${w/2}" y2="${h*.72}" stroke="#C09050" stroke-width=".8" opacity=".35"/><line x1="${w*.08}" y1="${h*.4}" x2="${w*.92}" y2="${h*.4}" stroke="#C09050" stroke-width=".8" opacity=".35"/><line x1="${w*.2}" y1="${h*.18}" x2="${w*.8}" y2="${h*.62}" stroke="#C09050" stroke-width=".8" opacity=".35"/><line x1="${w*.8}" y1="${h*.18}" x2="${w*.2}" y2="${h*.62}" stroke="#C09050" stroke-width=".8" opacity=".35"/><circle cx="${w/2}" cy="${h*.4}" r="${w*.09}" fill="#C09050" opacity=".12"/><circle cx="${w/2}" cy="${h*.4}" r="${w*.055}" fill="#C09050" opacity=".55"/><circle cx="${w/2}" cy="${h*.4}" r="${w*.022}" fill="#C09050"/><text x="${w/2}" y="${h*.88}" text-anchor="middle" font-size="${w*.11}" fill="#A09CB0" font-family="DM Sans,sans-serif" letter-spacing=".06em">THE STAR</text></svg>` },
+  no:    { ans:'No',    cls:'no',    card:'塔',   pos:'逆位', meaning:'根基有所动摇，此路暂时不通。这不是终点，而是一个提醒——放慢脚步，重新审视方向。当风暴平息，你会以更清醒的姿态重新出发。',
+    art:(w,h)=>`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><rect x="${w*.26}" y="${h*.14}" width="${w*.48}" height="${h*.42}" rx="2" stroke="#C09050" stroke-width="1.2"/><polygon points="${w*.26},${h*.14} ${w*.5},${h*.04} ${w*.74},${h*.14}" stroke="#C09050" stroke-width="1.2" fill="none"/><line x1="${w*.33}" y1="${h*.25}" x2="${w*.67}" y2="${h*.25}" stroke="#C09050" stroke-width=".8" opacity=".5"/><line x1="${w*.33}" y1="${h*.34}" x2="${w*.67}" y2="${h*.34}" stroke="#C09050" stroke-width=".8" opacity=".5"/><rect x="${w*.38}" y="${h*.44}" width="${w*.24}" height="${h*.12}" rx="1.5" stroke="#C09050" stroke-width=".9"/><text x="${w/2}" y="${h*.88}" text-anchor="middle" font-size="${w*.11}" fill="#A09CB0" font-family="DM Sans,sans-serif" letter-spacing=".06em">THE TOWER</text></svg>` },
+  maybe: { ans:'Maybe', cls:'maybe', card:'月亮', pos:'正位', meaning:'迷雾尚未完全散去，答案需要时间沉淀。保持耐心，倾听内心深处的声音。当时机成熟，方向自然会清晰。',
+    art:(w,h)=>`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><path d="M${w*.6} ${h*.07} A${w*.3} ${w*.3} 0 1 0 ${w*.6} ${h*.67} A${w*.18} ${w*.18} 0 1 1 ${w*.6} ${h*.07}Z" stroke="#C09050" stroke-width="1.2" fill="none"/><circle cx="${w*.27}" cy="${h*.62}" r="${w*.06}" stroke="#C09050" stroke-width=".9" fill="none"/><circle cx="${w*.46}" cy="${h*.68}" r="${w*.045}" stroke="#C09050" stroke-width=".9" fill="none"/><text x="${w/2}" y="${h*.88}" text-anchor="middle" font-size="${w*.11}" fill="#A09CB0" font-family="DM Sans,sans-serif" letter-spacing=".06em">THE MOON</text></svg>` },
+};
+
+const origins = {
+  'hist-yes':   { result:'yes',   from:'hist' },
+  'hist-no':    { result:'no',    from:'hist' },
+  'hist-maybe': { result:'maybe', from:'hist' },
+  'daily-yes':  { result:'yes',   from:'daily' },
+};
+
+function openDetail(key) {
+  const o = origins[key];
+  detailFrom = o.from;
+  const c = CARDS[o.result];
+  $('det-back-label').textContent = o.from === 'hist' ? '历史记录' : '每日记录';
+  $('det-body').innerHTML = `
+    <div class="det-answer ${c.cls}" style="text-align:center;padding:8px 24px 0;">${c.ans}</div>
+    <div class="det-card-wrap">
+      <div class="det-big-card">${c.art(96,154)}</div>
+      <div class="det-card-name">${c.card}</div>
+      <div class="det-pos-chip">${c.pos}</div>
+    </div>
+    <hr class="det-divider">
+    <div class="det-meaning">
+      <div class="det-meaning-label">牌意解读</div>
+      <div class="det-meaning-text">${c.meaning}</div>
+    </div>
+  `;
+  showScreen('s-detail');
+}
+
+function goBackFromDetail() {
+  showScreen(detailFrom === 'hist' ? 's-history' : 's-daily');
+}
+</script>
+</body>
+</html>
