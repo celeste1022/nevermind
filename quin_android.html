@@ -111,7 +111,9 @@ body {
 #s-initial {
   position:absolute; inset:0;
   display:flex; align-items:center;
-  transition: opacity .25s linear; /* Android: linear interpolator only */
+  /* ViewFlipper: android:inAnimation / outAnimation set to fade_in / fade_out */
+  transition: opacity .3s linear, transform .3s linear;
+  transform-origin: center;
 }
 .left-panel {
   padding: 0 0 0 22px;
@@ -158,21 +160,34 @@ body {
   display:flex; flex-direction:column;
   align-items:center; justify-content:center; gap:12px;
   opacity:0; pointer-events:none;
-  transition: opacity .25s linear;
+  /* ViewFlipper fade in */
+  transition: opacity .3s linear;
 }
 /*
-  Android: loading spinner = ProgressBar (indeterminate) in RemoteViews.
-  Simple circular ring, no custom path animation.
-  Text: static TextView, no per-character animation.
+  Android API 31+: remoteView.setColorStateList(R.id.spinner,
+    "setIndeterminateTintList", ColorStateList.valueOf(Color.parseColor("#C09050")))
+  → ProgressBar indeterminate ring tinted gold at runtime.
+  Below simulates this exact effect.
 */
 .and-spinner {
-  width:36px; height:36px;
-  border:2.5px solid var(--card-border);
-  border-top-color: var(--gold);
-  border-radius:50%;
-  animation: spin .9s linear infinite; /* linear = Android default */
+  width: 38px; height: 38px; position: relative;
 }
-@keyframes spin { to { transform:rotate(360deg); } }
+.and-spinner::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  border: 3px solid var(--card-border);
+}
+.and-spinner::after {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: var(--gold);   /* setIndeterminateTintList → #C09050 */
+  border-right-color: rgba(192,144,80,.35);
+  animation: spin .85s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 .load-text { font-size:11.5px; color:var(--text-mid); letter-spacing:.06em; }
 
 /* ── STATE: Done ── */
@@ -180,6 +195,7 @@ body {
   position:absolute; inset:0;
   display:flex; align-items:center;
   opacity:0; pointer-events:none;
+  /* ViewFlipper fade in */
   transition: opacity .3s linear;
 }
 /*
@@ -244,9 +260,9 @@ body {
 <body>
 
 <div class="pg-header">
-  <div class="platform-badge"><div class="dot"></div>Android Glance 近似方案</div>
+  <div class="platform-badge"><div class="dot"></div>Android Glance · API 31+</div>
   <div class="pg-title">Quin · 快速决策</div>
-  <div class="pg-sub">点击 → Loading → 结果直接切入</div>
+  <div class="pg-sub">ViewFlipper Fade · 自定义转圈颜色</div>
 </div>
 
 <div class="widget" id="widget">
@@ -289,7 +305,10 @@ body {
 </div>
 
 <div class="diff-note">
-  Android 版本精简为三态直接切换：初始态（静态牌轮）→ Loading（居中旋转圈）→ 完成态（牌面 + 答案同时淡入），全程无牌面位移或翻转动画。三态之间均为 250ms 线性 crossfade，符合 RemoteViews 动画限制。
+  <div class="spec-title">已加入两个小增强（API 31+）</div>
+  <div class="row"><span class="icon">✦</span><span><strong>ViewFlipper fade 过渡</strong>：三态切换时有简单淡入淡出（约 300ms linear），而非完全硬切。通过 ViewFlipper 的 <code>android:inAnimation / outAnimation</code> 设置 <code>fade_in / fade_out</code> 实现。</span></div>
+  <div class="row"><span class="icon">✦</span><span><strong>Loading 转圈颜色自定义</strong>：ProgressBar 的弧线颜色改为品牌金色 <code>#C09050</code>，通过 <code>remoteView.setColorStateList(R.id.spinner, "setIndeterminateTintList", ...)</code> 在运行时设置（API 31+ 支持）。</span></div>
+  <div class="spec-note">除以上两点外，其余限制不变：完成态内容全部同时出现（无 stagger），无位移或翻转动画。</div>
 </div>
 
 <div class="controls">
@@ -299,7 +318,7 @@ body {
   <button class="cb" id="cb-no"         onclick="jumpTo('no',this)">完成 · No</button>
   <button class="cb" id="cb-maybe"      onclick="jumpTo('maybe',this)">完成 · Maybe</button>
 </div>
-<p class="hint">点击小组件体验 Android 近似流程 · 三态 crossfade 切换</p>
+<p class="hint">点击小组件体验流程 · ViewFlipper fade 过渡 + 金色转圈（API 31+）</p>
 
 <script>
 const delay = ms => new Promise(r => setTimeout(r, ms));
@@ -321,14 +340,22 @@ const doneAnswer = $('done-answer'), doneCta = $('done-cta');
 const doneCard = $('done-card'), doneCardName = $('done-card-name');
 const resetBtn = $('reset-btn');
 
-// Crossfade helper — matches Android's alpha transition
+// ViewFlipper crossfade: current view fades out (150ms), then next fades in (300ms)
+// Matches android:inAnimation="@android:anim/fade_in" / outAnimation="@android:anim/fade_out"
 function crossfadeTo(target) {
-  [sInit, sLoad, sDone].forEach(el => {
-    el.style.opacity = '0';
-    el.style.pointerEvents = 'none';
+  const all = [sInit, sLoad, sDone];
+  // First fade out current visible state
+  all.forEach(el => {
+    if (el !== target && el.style.opacity !== '0') {
+      el.style.opacity = '0';
+      el.style.pointerEvents = 'none';
+    }
   });
-  target.style.opacity = '1';
-  target.style.pointerEvents = 'all';
+  // Then fade in next state after short delay (ViewFlipper overlap)
+  setTimeout(() => {
+    target.style.opacity = '1';
+    target.style.pointerEvents = 'all';
+  }, 120);
 }
 
 $('widget').addEventListener('click', () => {
