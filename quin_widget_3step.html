@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quin · Widget · 抽牌流程</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #F2EEE7; --widget-bg: #FFFFFF;
+  --text-dark: #1C1A2E; --text-mid: #6B6680; --text-light: #A09CB0;
+  --gold: #C09050; --card-bg: #FBF8F2; --card-border: #E4DDD0;
+  --yes: #3FA876; --no: #CC5858; --maybe: #7E62B8;
+  --shadow: 0 16px 48px rgba(28,26,46,.18), 0 2px 8px rgba(28,26,46,.07);
+  --r: 22px;
+}
+body {
+  background: var(--bg); min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-family: 'DM Sans', sans-serif; gap: 24px; padding: 48px 24px;
+}
+.pg-title { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:var(--text-dark); letter-spacing:.04em; text-align:center; }
+.pg-sub { font-size:11px; color:var(--text-light); letter-spacing:.12em; text-transform:uppercase; margin-top:4px; text-align:center; }
+
+.widget {
+  width: 329px; height: 155px; background: var(--widget-bg);
+  border-radius: var(--r); box-shadow: var(--shadow);
+  position: relative; overflow: hidden;
+  cursor: pointer; user-select: none;
+}
+
+/* ── S0: INITIAL ── */
+#s0 { position:absolute; inset:0; display:flex; align-items:center; transition:opacity .32s ease; }
+.s0-text {
+  padding-left:22px; width:175px;
+  display:flex; flex-direction:column; justify-content:center; gap:8px;
+  transition: transform .36s cubic-bezier(.4,0,1,1), opacity .3s ease;
+}
+.s0-title { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:600; color:var(--text-dark); line-height:1; }
+.s0-sub { font-size:10.5px; color:var(--text-mid); line-height:1.65; font-weight:300; }
+.s0-fan { position:absolute; right:10px; top:0; bottom:0; width:152px; display:flex; align-items:center; justify-content:center; transition:opacity .35s ease; }
+.s0-fan-inner { position:relative; width:90px; height:118px; }
+.fan-card {
+  position:absolute; width:55px; height:86px; border-radius:7px;
+  background:var(--card-bg); border:1px solid var(--card-border);
+  transform-origin:50% 100%; left:50%; bottom:2px; margin-left:-27.5px;
+  box-shadow:0 2px 8px rgba(28,26,46,.08); overflow:hidden;
+}
+.fan-card::after {
+  content:''; position:absolute; inset:5px; border:1px solid var(--card-border); border-radius:4px;
+  background: repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(192,144,80,.06) 3px,rgba(192,144,80,.06) 4px),
+              repeating-linear-gradient(-45deg,transparent,transparent 3px,rgba(192,144,80,.04) 3px,rgba(192,144,80,.04) 4px);
+}
+.fc1{transform:rotate(-24deg)} .fc2{transform:rotate(-12deg)} .fc3{transform:rotate(0)}
+.fc4{transform:rotate(12deg)}  .fc5{transform:rotate(24deg)}
+.s0-pulse { position:absolute; bottom:-4px; left:50%; transform:translateX(-50%); width:64px; height:12px; border-radius:50%; background:radial-gradient(ellipse,rgba(192,144,80,.22) 0%,transparent 70%); animation:pulse 2.4s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:.35;transform:translateX(-50%) scaleX(1)} 50%{opacity:1;transform:translateX(-50%) scaleX(1.3)} }
+
+/* ── S1: BIG ARC with gap + lone card floating above gap ── */
+#s1 {
+  position:absolute; inset:0; overflow:hidden;
+  opacity:0; pointer-events:none; transition:opacity .35s ease;
+  background: #F6F3EE;
+}
+.s1-bg { position:absolute; inset:0; background:radial-gradient(ellipse at 50% 140%, rgba(30,25,58,.12) 0%,transparent 65%); }
+
+/* Arc cards slide as a group */
+#arc-wrap {
+  position:absolute; inset:0;
+  transition: transform .62s cubic-bezier(.4,0,.5,1), opacity .5s ease;
+}
+.arc-card {
+  position:absolute; width:46px; height:73px; border-radius:6px;
+  background:linear-gradient(160deg,#22203A 0%,#16142C 100%);
+  border:1px solid #2E2B4A;
+  box-shadow:0 4px 16px rgba(10,8,26,.32), inset 0 1px 0 rgba(255,255,255,.06);
+  overflow:hidden;
+}
+.arc-card::before { content:''; position:absolute; inset:5px; border:1px solid rgba(192,144,80,.22); border-radius:3px; }
+.arc-card::after { content:''; position:absolute; width:17px; height:17px; border-radius:50%; border:1px solid rgba(192,144,80,.32); top:50%; left:50%; transform:translate(-50%,-50%) translateY(-3px); }
+.arc-sym { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) translateY(-3px) rotate(45deg); width:7px; height:7px; border:1px solid rgba(192,144,80,.45); }
+
+/*
+  LONE CARD — sits above the gap in the arc.
+  Position: arc center = (164.5, 260-175) = (164.5, 85)
+  Lone card (72×114) centered there: left=128.5, top=28
+  We float it a bit higher: top=16 to look "pulled out"
+  
+  When arc slides down, this card stays → looks like it was extracted.
+  Then in S2, card stays exactly here (widget center ≈ top:20, left:128).
+*/
+#lone-card {
+  position:absolute;
+  width:72px; height:114px; border-radius:9px;
+  background:linear-gradient(155deg,#22203A 0%,#16142C 100%);
+  border:1px solid #2E2B4A;
+  box-shadow: 0 10px 32px rgba(10,8,26,.45), inset 0 1px 0 rgba(255,255,255,.07);
+  left:128.5px; top:16px;   /* above gap center */
+  overflow:hidden; z-index:20;
+  transition: top .55s cubic-bezier(.22,1,.36,1), left .55s cubic-bezier(.22,1,.36,1),
+              box-shadow .55s ease;
+  /* Subtle float animation while in S1 */
+  animation: cardFloat 3s ease-in-out infinite;
+}
+@keyframes cardFloat {
+  0%,100% { transform:translateY(0); }
+  50%      { transform:translateY(-3px); }
+}
+#lone-card::before { content:''; position:absolute; inset:8px; border:1px solid rgba(192,144,80,.28); border-radius:5px; }
+.lone-ring { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) translateY(-6px); width:30px; height:30px; border-radius:50%; border:1px solid rgba(192,144,80,.4); }
+.lone-diamond { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) translateY(-6px) rotate(45deg); width:11px; height:11px; border:1px solid rgba(192,144,80,.52); }
+
+/* Glow under lone card in S1 (subtle) */
+#lone-glow {
+  position:absolute; left:128.5px; top:110px; z-index:19;
+  width:72px; height:20px; border-radius:50%;
+  background:radial-gradient(ellipse,rgba(192,144,80,.22) 0%,transparent 70%);
+  animation: cardFloat 3s ease-in-out infinite;
+}
+
+/* ── S2: CARD CENTERED, FACE DOWN, WAITING ── */
+/*
+  In S2 we reuse the #lone-card element (now moved to true center).
+  True center for 72×114 card: left=128.5, top=20.5
+  Loading overlay + hint live inside s1 (shown when arc is gone).
+*/
+#lone-loading {
+  position:absolute; inset:0; border-radius:9px;
+  background:rgba(18,16,36,.78);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:5px;
+  opacity:0; transition:opacity .22s ease; pointer-events:none; z-index:30;
+}
+#lone-loading.show { opacity:1; }
+.mini-spinner { width:18px; height:18px; position:relative; }
+.mini-spinner::before { content:''; position:absolute; inset:0; border-radius:50%; border:2px solid rgba(255,255,255,.1); }
+.mini-spinner::after  { content:''; position:absolute; inset:0; border-radius:50%; border:2px solid transparent; border-top-color:var(--gold); border-right-color:rgba(192,144,80,.28); animation:spin .9s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.mini-load-text { font-size:7.5px; color:rgba(192,144,80,.65); letter-spacing:.05em; }
+
+/* Hint below card */
+#lone-hint {
+  position:absolute; z-index:25;
+  left:0; right:0; bottom:10px;
+  text-align:center; font-size:10px; color:var(--text-mid);
+  letter-spacing:.07em; opacity:0; pointer-events:none;
+  transition:opacity .35s ease;
+}
+
+/* ── S3: CARD FLIPPED IN CENTER, card name below ── */
+#center-card-name {
+  position:absolute; z-index:25;
+  /* card: top=20.5, height=114 → bottom of card = 134.5. Name sits just below at ~138px */
+  left:0; right:0; top:138px;
+  text-align:center;
+  font-family:'Cormorant Garamond',serif; font-size:13px; font-weight:600;
+  color:var(--text-dark); letter-spacing:.04em;
+  opacity:0; pointer-events:none;
+  transition:opacity .4s ease;
+}
+#center-tap-hint {
+  position:absolute; z-index:25;
+  /* Left side, vertically centered */
+  left:18px; top:50%; transform:translateY(-50%);
+  width:100px;
+  text-align:left; font-size:10px; color:var(--text-mid); letter-spacing:.06em;
+  line-height:1.6;
+  opacity:0; pointer-events:none; transition:opacity .35s ease;
+}
+
+/* Front face of lone card (face-up tarot art) */
+#lone-front {
+  position:absolute; inset:0; border-radius:9px;
+  background:var(--card-bg);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; opacity:0;
+}
+
+/* ── S2 flip support — scaleX on lone-card ── */
+#lone-card.flipping {
+  transition: transform .22s cubic-bezier(.4,0,1,1) !important;
+  animation: none !important;
+}
+#lone-card.expanding {
+  transition: transform .4s cubic-bezier(0,.85,.45,1), top .55s cubic-bezier(.22,1,.36,1), left .55s cubic-bezier(.22,1,.36,1) !important;
+  animation: none !important;
+}
+
+/* ── S4: DONE — card on right, answer on left ── */
+#s4 {
+  position:absolute; inset:0;
+  opacity:0; pointer-events:none; transition:opacity .3s ease;
+}
+.done-left {
+  position:absolute; left:18px; top:0; bottom:0; width:192px;
+  display:flex; flex-direction:column; justify-content:center; gap:7px;
+}
+.done-mini { font-family:'Cormorant Garamond',serif; font-size:10.5px; color:var(--text-light); letter-spacing:.06em; opacity:0; transition:opacity .3s ease; }
+.done-answer { font-family:'Cormorant Garamond',serif; font-size:62px; font-weight:600; line-height:.92; opacity:0; transition:opacity 1s cubic-bezier(.4,0,.2,1); }
+.done-answer.yes{color:var(--yes)} .done-answer.no{color:var(--no)} .done-answer.maybe{color:var(--maybe)}
+.done-cta { display:inline-flex; align-items:center; padding:6px 14px; border-radius:24px; font-size:11px; font-weight:500; border:none; cursor:pointer; width:fit-content; color:white; font-family:'DM Sans',sans-serif; opacity:0; transition:opacity .5s ease; }
+.done-cta:active{transform:scale(.96)}
+.done-cta.yes{background:var(--yes)} .done-cta.no{background:var(--no)} .done-cta.maybe{background:var(--maybe)}
+.done-right { position:absolute; right:14px; top:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; }
+.done-card-final { width:62px; height:98px; border-radius:8px; background:var(--card-bg); border:1px solid var(--card-border); box-shadow:0 5px 16px rgba(28,26,46,.12); display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.done-card-name-final { font-size:9px; color:var(--text-light); text-align:center; line-height:1.4; opacity:0; transition:opacity .3s ease; }
+.done-reset { position:absolute; top:10px; right:10px; width:26px; height:26px; border-radius:50%; background:rgba(160,156,176,.12); border:none; cursor:pointer; z-index:30; display:flex; align-items:center; justify-content:center; font-size:14px; color:var(--text-mid); opacity:0; pointer-events:none; transition:opacity .3s,background .15s; }
+.done-reset:hover{background:rgba(160,156,176,.22)}
+
+/* Shimmer */
+.shimmer::after { content:''; position:absolute; inset:0; background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.5) 50%,transparent 70%); animation:shimmer .28s ease-in-out forwards; border-radius:inherit; }
+@keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(140%)} }
+
+/* Fan reform */
+@keyframes spreadIn { from{transform:rotate(var(--rv)) scale(0.1) translateY(10px);opacity:0} 60%{opacity:1} to{transform:rotate(var(--rv)) scale(1) translateY(0);opacity:1} }
+.fc1{--rv:-24deg} .fc2{--rv:-12deg} .fc3{--rv:0deg} .fc4{--rv:12deg} .fc5{--rv:24deg}
+.fan-card.spread-in{animation:spreadIn .5s cubic-bezier(.34,1.3,.64,1) both}
+
+/* Controls */
+.controls { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+.cb { padding:7px 16px; border-radius:24px; border:1.5px solid #D6D0C8; background:transparent; font-size:12px; color:var(--text-mid); cursor:pointer; font-family:'DM Sans',sans-serif; transition:all .15s; }
+.cb:hover:not(.on){border-color:var(--text-dark);color:var(--text-dark)}
+.cb.on{background:var(--text-dark);color:#fff;border-color:var(--text-dark)}
+.step-indicator { display:flex; align-items:center; gap:8px; }
+.step-dot { width:7px; height:7px; border-radius:50%; background:var(--card-border); transition:background .3s,transform .3s; }
+.step-dot.active{background:var(--gold);transform:scale(1.3)}
+.hint { font-size:11px; color:var(--text-light); text-align:center; max-width:329px; line-height:1.7; }
+</style>
+</head>
+<body>
+
+<div>
+  <div class="pg-title">Quin · 快速决策 · 抽牌流程</div>
+  <div class="pg-sub">iOS WidgetKit · 点击四次完成体验</div>
+</div>
+
+<div class="step-indicator">
+  <div class="step-dot active" id="dot0"></div>
+  <div class="step-dot" id="dot1"></div>
+  <div class="step-dot" id="dot2"></div>
+  <div class="step-dot" id="dot3"></div>
+  <div class="step-dot" id="dot4"></div>
+</div>
+
+<div class="widget" id="widget">
+
+  <!-- S0: INITIAL -->
+  <div id="s0" style="opacity:1;pointer-events:all;">
+    <div class="s0-text" id="s0-text">
+      <div class="s0-title">快速决策</div>
+      <div class="s0-sub">默念心中之问<br>轻触牌轮，聆听命运</div>
+    </div>
+    <div class="s0-fan" id="s0-fan">
+      <div class="s0-fan-inner">
+        <div class="fan-card fc1"></div><div class="fan-card fc2"></div>
+        <div class="fan-card fc3"></div><div class="fan-card fc4"></div>
+        <div class="fan-card fc5"></div>
+        <div class="s0-pulse"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S1: BIG ARC (reused for S2 and S3 too) -->
+  <div id="s1">
+    <div class="s1-bg"></div>
+    <!-- Arc cards (gap in center) — slides down on step2 click -->
+    <div id="arc-wrap"></div>
+    <!-- Lone card: floats above gap, stays when arc slides -->
+    <div id="lone-card">
+      <div class="lone-ring"></div>
+      <div class="lone-diamond"></div>
+      <div id="lone-front"></div>
+      <div id="lone-loading">
+        <div class="mini-spinner"></div>
+        <div class="mini-load-text">能量感应中</div>
+      </div>
+    </div>
+    <!-- Glow under lone card -->
+    <div id="lone-glow"></div>
+    <!-- Hint / card name labels (swap between them) -->
+    <div id="lone-hint">轻触牌背，揭晓答案</div>
+    <div id="center-card-name"></div>
+    <div id="center-tap-hint">再次点击<br>查看解读</div>
+  </div>
+
+  <!-- S4: DONE -->
+  <div id="s4">
+    <div class="done-left">
+      <div class="done-mini" id="done-mini">快速决策</div>
+      <div class="done-answer" id="done-answer"></div>
+      <button class="done-cta" id="done-cta" onclick="event.stopPropagation()">展开来看</button>
+    </div>
+    <div class="done-right">
+      <div class="done-card-final" id="done-card-final"></div>
+      <div class="done-card-name-final" id="done-card-name-final"></div>
+    </div>
+    <button class="done-reset" id="done-reset" onclick="event.stopPropagation();doReset()">↺</button>
+  </div>
+
+</div>
+
+<div class="controls">
+  <button class="cb on" id="cb0" onclick="jumpTo(0)">初始态</button>
+  <button class="cb"    id="cb1" onclick="jumpTo(1)">牌阵展开</button>
+  <button class="cb"    id="cb2" onclick="jumpTo(2)">牌背居中</button>
+  <button class="cb"    id="cb3" onclick="jumpTo(3)">牌面翻开</button>
+  <button class="cb"    id="cb4" onclick="jumpTo(4)">完成态</button>
+</div>
+<p class="hint">点击小组件体验完整流程 · 点四次完成抽牌</p>
+
+<script>
+const delay = ms => new Promise(r => setTimeout(r, ms));
+const $ = id => document.getElementById(id);
+
+/* ── Card data ── */
+const CARDS = {
+  yes:   { name:'星星', fullname:'星星 · 正位', cls:'yes',   art:starSVG   },
+  no:    { name:'塔',   fullname:'塔 · 逆位',   cls:'no',    art:towerSVG  },
+  maybe: { name:'月亮', fullname:'月亮 · 正位', cls:'maybe', art:moonSVG   },
+};
+function starSVG(w,h,big){const s=big?1.4:1;return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><circle cx="${w/2}" cy="${h*.42}" r="${w*.28}" stroke="#C09050" stroke-width="1.2"/><line x1="${w/2}" y1="${h*.08}" x2="${w/2}" y2="${h*.76}" stroke="#C09050" stroke-width=".8" opacity=".35"/><line x1="${w*.08}" y1="${h*.42}" x2="${w*.92}" y2="${h*.42}" stroke="#C09050" stroke-width=".8" opacity=".35"/><line x1="${w*.2}" y1="${h*.2}" x2="${w*.8}" y2="${h*.64}" stroke="#C09050" stroke-width=".8" opacity=".35"/><line x1="${w*.8}" y1="${h*.2}" x2="${w*.2}" y2="${h*.64}" stroke="#C09050" stroke-width=".8" opacity=".35"/><circle cx="${w/2}" cy="${h*.42}" r="${w*.09}" fill="#C09050" opacity=".12"/><circle cx="${w/2}" cy="${h*.42}" r="${w*.055}" fill="#C09050" opacity=".55"/><circle cx="${w/2}" cy="${h*.42}" r="${w*.022}" fill="#C09050"/><text x="${w/2}" y="${h*.88}" text-anchor="middle" font-size="${w*.12}" fill="#A09CB0" font-family="DM Sans,sans-serif" letter-spacing=".06em">THE STAR</text></svg>`;}
+function towerSVG(w,h){return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><rect x="${w*.28}" y="${h*.16}" width="${w*.44}" height="${h*.4}" rx="1.5" stroke="#C09050" stroke-width="1.2"/><polygon points="${w*.28},${h*.16} ${w*.5},${h*.05} ${w*.72},${h*.16}" stroke="#C09050" stroke-width="1.2" fill="none"/><line x1="${w*.35}" y1="${h*.27}" x2="${w*.65}" y2="${h*.27}" stroke="#C09050" stroke-width=".8" opacity=".5"/><line x1="${w*.35}" y1="${h*.36}" x2="${w*.65}" y2="${h*.36}" stroke="#C09050" stroke-width=".8" opacity=".5"/><rect x="${w*.38}" y="${h*.46}" width="${w*.24}" height="${h*.1}" rx="1" stroke="#C09050" stroke-width=".9"/><text x="${w/2}" y="${h*.88}" text-anchor="middle" font-size="${w*.12}" fill="#A09CB0" font-family="DM Sans,sans-serif" letter-spacing=".06em">THE TOWER</text></svg>`;}
+function moonSVG(w,h){return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><path d="M${w*.6} ${h*.08} A${w*.32} ${w*.32} 0 1 0 ${w*.6} ${h*.72} A${w*.19} ${w*.19} 0 1 1 ${w*.6} ${h*.08}Z" stroke="#C09050" stroke-width="1.2" fill="none"/><circle cx="${w*.28}" cy="${h*.65}" r="${w*.065}" stroke="#C09050" stroke-width=".9" fill="none"/><circle cx="${w*.48}" cy="${h*.71}" r="${w*.048}" stroke="#C09050" stroke-width=".9" fill="none"/><text x="${w/2}" y="${h*.88}" text-anchor="middle" font-size="${w*.12}" fill="#A09CB0" font-family="DM Sans,sans-serif" letter-spacing=".06em">THE MOON</text></svg>`;}
+
+/* ── Build arc with gap at center ── */
+(function buildArc(){
+  const cont = $('arc-wrap');
+  const N=15, arcDeg=158, pivotX=164.5, pivotY=262, radius=178;
+  for(let i=0; i<N; i++){
+    if(i===7) continue; // gap — lone card sits here
+    const angle = -arcDeg/2 + (arcDeg/(N-1))*i;
+    const rad = angle*Math.PI/180;
+    const cx = pivotX + Math.sin(rad)*radius;
+    const cy = pivotY - Math.cos(rad)*radius;
+    const card = document.createElement('div');
+    card.className='arc-card';
+    const sym=document.createElement('div'); sym.className='arc-sym';
+    card.appendChild(sym);
+    const dist=Math.abs(i-7);
+    const opac=0.42+(1-dist/(N/2))*0.52;
+    card.style.cssText=`left:${cx-23}px;top:${cy-36.5}px;transform:rotate(${angle}deg);z-index:${i<7?i:N-i};opacity:${Math.min(opac,1)};`;
+    cont.appendChild(card);
+  }
+  // Lone card position = arc center (i=7, angle=0)
+  // cx=164.5, cy=262-178=84. Card 72×114 centered: left=164.5-36=128.5, top=84-57=27
+  // We float it higher: top=14 (13px above natural position → "pulled out" look)
+  $('lone-card').style.left='128.5px';
+  $('lone-card').style.top='14px';
+  $('lone-glow').style.left='128.5px';
+  $('lone-glow').style.top='108px';
+})();
+
+/* ── Lone card center target (widget center) ── */
+const LONE_CENTER = { left:128.5, top:20.5 };
+// Done position (right side, 62×98 card): right=14 → left=329-14-62=253
+const DONE_RIGHT_LEFT = 253;
+const DONE_RIGHT_TOP  = (155-98)/2; // 28.5
+
+/* ── State ── */
+let step=0, busy=false, apiDone=false, picked='yes';
+const dots=[0,1,2,3,4].map(i=>$(`dot${i}`));
+function setDot(i){ dots.forEach((d,j)=>d.classList.toggle('active',j===i)); }
+
+$('widget').addEventListener('click', async()=>{
+  if(busy) return;
+  if(step===0) await goS1();
+  else if(step===1) await goS2();
+  else if(step===2 && apiDone) await goS3();
+  else if(step===3) await goS4();
+});
+
+/* S0 → S1: text + small fan fade, big arc crossfades in */
+async function goS1(){
+  busy=true; step=1; setDot(1);
+  $('s0-text').style.transform='translateX(-32px)';
+  $('s0-text').style.opacity='0';
+  await delay(80);
+  $('s0-fan').style.opacity='0';
+  await delay(300);
+  $('s0').style.opacity='0'; $('s0').style.pointerEvents='none';
+  // Reset arc and lone card to initial positions
+  resetArc();
+  setLonePos(128.5, 14);
+  $('lone-card').style.animation='cardFloat 3s ease-in-out infinite';
+  $('lone-glow').style.opacity='1';
+  $('lone-front').style.opacity='0';
+  $('lone-loading').classList.remove('show');
+  $('lone-hint').style.opacity='0';
+  $('center-card-name').style.opacity='0';
+  $('center-tap-hint').style.opacity='0';
+  $('s1').style.opacity='1'; $('s1').style.pointerEvents='all';
+  busy=false; updateCBs(1);
+}
+
+/* S1 → S2: arc slides DOWN, lone card moves to true center, API fires */
+async function goS2(){
+  busy=true; step=2; setDot(2);
+  picked=['yes','no','maybe'][Math.floor(Math.random()*3)];
+  apiDone=false;
+
+  // Prefill front face (hidden)
+  $('lone-front').innerHTML=CARDS[picked].art(60,96);
+
+  // Stop float animation, transition lone card to true center
+  $('lone-card').style.animation='none';
+  $('lone-glow').style.opacity='0';
+  setLonePos(LONE_CENTER.left, LONE_CENTER.top);
+
+  // Arc slides down simultaneously
+  const arc=$('arc-wrap');
+  arc.style.transition='transform .62s cubic-bezier(.4,0,.5,1), opacity .5s ease';
+  arc.style.transform='translateY(230px)';
+  arc.style.opacity='0';
+
+  // Wait for both to settle
+  await delay(680);
+
+  // Hint appears
+  $('lone-hint').style.opacity='1';
+
+  // Loading overlay after short pause
+  await delay(350);
+  $('lone-loading').classList.add('show');
+  $('lone-hint').style.opacity='0';
+
+  // API: 1100ms
+  setTimeout(()=>{
+    apiDone=true;
+    $('lone-loading').classList.remove('show');
+    setTimeout(()=>{ $('lone-hint').style.opacity='1'; }, 120);
+  }, 1100);
+
+  busy=false; updateCBs(2);
+}
+
+/* S2 → S3: flip in center, card name appears */
+async function goS3(){
+  busy=true; step=3; setDot(3);
+  $('lone-hint').style.opacity='0';
+
+  // 2D scaleX flip on lone-card
+  const lc=$('lone-card');
+  lc.classList.add('shimmer');
+  lc.style.animation='none';
+  lc.style.transition='transform .22s cubic-bezier(.4,0,1,1)';
+  lc.style.transformOrigin='center center';
+  lc.style.transform='scaleX(0)';
+  await delay(220);
+
+  // At scaleX=0: swap front face in
+  lc.classList.remove('shimmer');
+  $('lone-front').style.opacity='1';
+  // Hide back decorations
+  $('lone-card').querySelector('.lone-ring').style.opacity='0';
+  $('lone-card').querySelector('.lone-diamond').style.opacity='0';
+  lc.style.background='var(--card-bg)';
+  lc.style.borderColor='var(--card-border)';
+  lc.style.boxShadow='0 8px 28px rgba(28,26,46,.13)';
+  $('lone-front').classList.add('shimmer');
+
+  // Expand with spring
+  lc.style.transition='transform .4s cubic-bezier(0,.85,.45,1)';
+  lc.style.transform='scaleX(1)';
+  await delay(260); $('lone-front').classList.remove('shimmer');
+
+  // Card name appears below the card
+  $('center-card-name').textContent=CARDS[picked].fullname;
+  $('center-card-name').style.opacity='1';
+
+  // Tap hint on left side after card name settles
+  await delay(500);
+  $('center-tap-hint').style.opacity='1';
+
+  busy=false; updateCBs(3);
+}
+
+/* S3 → S4: card slides right, answer fades in left */
+async function goS4(){
+  busy=true; step=4; setDot(4);
+  $('center-card-name').style.opacity='0';
+  $('center-tap-hint').style.opacity='0';
+
+  // Populate S4 — but keep done-card-final invisible during transition
+  // (lone-card will be the visible card until it lands)
+  const card=CARDS[picked];
+  $('done-card-final').innerHTML=card.art(46,72);
+  $('done-card-final').style.opacity='0'; // hidden until swap
+  $('done-card-name-final').textContent=card.fullname;
+  $('done-answer').textContent=picked==='yes'?'Yes':picked==='no'?'No':'Maybe';
+  $('done-answer').className='done-answer '+card.cls;
+  $('done-cta').className='done-cta '+card.cls;
+
+  // Move lone-card to right position — it's the only visible card the whole time
+  const lc=$('lone-card');
+  lc.style.transition='left .5s cubic-bezier(.22,1,.36,1), top .5s cubic-bezier(.22,1,.36,1), width .5s ease, height .5s ease, border-radius .5s ease, box-shadow .5s ease';
+  lc.style.left=DONE_RIGHT_LEFT+'px';
+  lc.style.top=DONE_RIGHT_TOP+'px';
+  lc.style.width='62px'; lc.style.height='98px'; lc.style.borderRadius='8px';
+
+  // Wait for lone-card to fully arrive before touching anything
+  await delay(520);
+
+  // Now swap: s4 fades in, s1 fades out simultaneously
+  // done-card-final snaps visible at the same moment s1 hides
+  // (lone-card and done-card-final are in the same spot, so no jump)
+  $('s4').style.opacity='1'; $('s4').style.pointerEvents='all';
+  $('done-card-final').style.opacity='1';
+  $('s1').style.opacity='0'; $('s1').style.pointerEvents='none';
+
+  // Answer reveals
+  await delay(80);
+  $('done-mini').style.opacity='1';
+  await delay(80);
+  $('done-answer').style.opacity='1';
+  await delay(1050);
+  $('done-cta').style.opacity='1';
+  $('done-card-name-final').style.opacity='1';
+  $('done-reset').style.opacity='1'; $('done-reset').style.pointerEvents='all';
+
+  busy=false; updateCBs(4);
+}
+
+/* Reset */
+async function doReset(){
+  if(busy) return; busy=true;
+  $('done-cta').style.opacity='0'; $('done-answer').style.opacity='0';
+  $('done-mini').style.opacity='0'; $('done-card-name-final').style.opacity='0';
+  $('done-reset').style.opacity='0'; $('done-reset').style.pointerEvents='none';
+  await delay(180);
+  $('s4').style.opacity='0'; $('s4').style.pointerEvents='none';
+
+  // Reform small fan
+  const fanCards=document.querySelectorAll('.s0-fan .fan-card');
+  [160,80,0,80,160].forEach((d,i)=>{
+    fanCards[i].style.animation='none'; void fanCards[i].offsetHeight;
+    fanCards[i].style.animationDelay=d+'ms';
+    fanCards[i].classList.add('spread-in');
+    setTimeout(()=>fanCards[i].classList.remove('spread-in'),800+d);
+  });
+  $('s0-fan').style.opacity='1';
+  await delay(200);
+
+  $('s0-text').style.opacity='0'; $('s0-text').style.transform='translateX(-24px)';
+  void $('s0-text').offsetHeight;
+  $('s0-text').style.transition='transform .4s cubic-bezier(.22,1,.36,1),opacity .4s ease';
+  $('s0-text').style.transform='translateX(0)'; $('s0-text').style.opacity='1';
+  $('s0').style.opacity='1'; $('s0').style.pointerEvents='all';
+
+  await delay(450);
+  $('s0-text').style.transition='transform .36s cubic-bezier(.4,0,1,1),opacity .3s ease';
+  step=0; setDot(0); busy=false; updateCBs(0);
+}
+
+/* Helpers */
+function setLonePos(l,t){
+  const lc=$('lone-card');
+  lc.style.left=l+'px'; lc.style.top=t+'px';
+}
+function resetArc(){
+  const arc=$('arc-wrap');
+  arc.style.transition='none';
+  arc.style.transform='translateY(0)'; arc.style.opacity='1';
+  void arc.offsetHeight;
+  arc.style.transition='transform .62s cubic-bezier(.4,0,.5,1),opacity .5s ease';
+}
+function resetLoneCard(){
+  const lc=$('lone-card');
+  lc.style.transition='top .55s cubic-bezier(.22,1,.36,1),left .55s cubic-bezier(.22,1,.36,1),box-shadow .55s ease';
+  lc.style.width='72px'; lc.style.height='114px'; lc.style.borderRadius='9px';
+  lc.style.transform='scaleX(1)'; lc.style.transformOrigin='center center';
+  lc.style.background='linear-gradient(155deg,#22203A 0%,#16142C 100%)';
+  lc.style.borderColor='#2E2B4A'; lc.style.boxShadow='0 10px 32px rgba(10,8,26,.45),inset 0 1px 0 rgba(255,255,255,.07)';
+  $('lone-card').querySelector('.lone-ring').style.opacity='1';
+  $('lone-card').querySelector('.lone-diamond').style.opacity='1';
+  $('lone-front').style.opacity='0'; $('lone-front').innerHTML='';
+  $('lone-loading').classList.remove('show');
+  $('lone-hint').style.opacity='0';
+  $('center-card-name').style.opacity='0';
+  $('center-tap-hint').style.opacity='0';
+}
+
+function jumpTo(n){
+  if(busy) return;
+  // Full reset
+  $('s0').style.cssText='position:absolute;inset:0;display:flex;align-items:center;opacity:0;pointer-events:none;transition:opacity .32s ease';
+  $('s0-text').style.cssText='padding-left:22px;width:175px;display:flex;flex-direction:column;justify-content:center;gap:8px;transition:transform .36s cubic-bezier(.4,0,1,1),opacity .3s ease';
+  $('s0-fan').style.opacity='1';
+  $('s1').style.opacity='0'; $('s1').style.pointerEvents='none';
+  $('s4').style.opacity='0'; $('s4').style.pointerEvents='none';
+  $('done-mini').style.opacity='0'; $('done-answer').style.opacity='0';
+  $('done-cta').style.opacity='0'; $('done-card-name-final').style.opacity='0';
+  $('done-reset').style.cssText='position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:50%;background:rgba(160,156,176,.12);border:none;cursor:pointer;z-index:30;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--text-mid);opacity:0;pointer-events:none;transition:opacity .3s,background .15s';
+  resetArc(); resetLoneCard();
+
+  if(n===0){
+    $('s0').style.opacity='1'; $('s0').style.pointerEvents='all'; step=0; setDot(0);
+  } else if(n===1){
+    setLonePos(128.5,14);
+    $('lone-card').style.animation='cardFloat 3s ease-in-out infinite';
+    $('lone-glow').style.opacity='1';
+    $('s1').style.opacity='1'; $('s1').style.pointerEvents='all'; step=1; setDot(1);
+  } else if(n===2){
+    $('arc-wrap').style.transition='none'; $('arc-wrap').style.transform='translateY(230px)'; $('arc-wrap').style.opacity='0';
+    setLonePos(LONE_CENTER.left, LONE_CENTER.top);
+    $('lone-card').style.animation='none'; $('lone-glow').style.opacity='0';
+    $('lone-hint').style.opacity='1';
+    $('s1').style.opacity='1'; $('s1').style.pointerEvents='all';
+    step=2; apiDone=true; setDot(2);
+  } else if(n===3){
+    const r=['yes','no','maybe'][Math.floor(Math.random()*3)]; picked=r;
+    $('lone-front').innerHTML=CARDS[r].art(60,96);
+    $('arc-wrap').style.transition='none'; $('arc-wrap').style.transform='translateY(230px)'; $('arc-wrap').style.opacity='0';
+    setLonePos(LONE_CENTER.left, LONE_CENTER.top);
+    $('lone-card').style.animation='none'; $('lone-glow').style.opacity='0';
+    $('lone-card').style.transform='scaleX(1)';
+    $('lone-front').style.opacity='1';
+    $('lone-card').querySelector('.lone-ring').style.opacity='0';
+    $('lone-card').querySelector('.lone-diamond').style.opacity='0';
+    $('lone-card').style.background='var(--card-bg)'; $('lone-card').style.borderColor='var(--card-border)';
+    $('lone-card').style.boxShadow='0 8px 28px rgba(28,26,46,.13)';
+    $('center-card-name').textContent=CARDS[r].fullname; $('center-card-name').style.opacity='1';
+    $('center-tap-hint').style.opacity='1';
+    $('s1').style.opacity='1'; $('s1').style.pointerEvents='all'; step=3; setDot(3);
+  } else if(n===4){
+    const r=['yes','no','maybe'][Math.floor(Math.random()*3)]; picked=r;
+    const card=CARDS[r];
+    $('done-card-final').innerHTML=card.art(46,72);
+    $('done-card-final').style.opacity='1';
+    $('done-card-name-final').textContent=card.fullname;
+    $('done-answer').textContent=r==='yes'?'Yes':r==='no'?'No':'Maybe';
+    $('done-answer').className='done-answer '+card.cls;
+    $('done-cta').className='done-cta '+card.cls;
+    $('done-mini').style.opacity='1'; $('done-answer').style.opacity='1';
+    $('done-cta').style.opacity='1'; $('done-card-name-final').style.opacity='1';
+    $('done-reset').style.opacity='1'; $('done-reset').style.pointerEvents='all';
+    $('s4').style.opacity='1'; $('s4').style.pointerEvents='all'; step=4; setDot(4);
+  }
+  updateCBs(n);
+}
+function updateCBs(n){ document.querySelectorAll('.cb').forEach(b=>b.classList.remove('on')); $(`cb${n}`).classList.add('on'); }
+</script>
+</body>
+</html>
