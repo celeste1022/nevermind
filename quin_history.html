@@ -538,12 +538,18 @@ function showScreen(id) {
 }
 
 const CARDS = {
-  yes:   { ans:'Yes',   cls:'yes',   card:'星星', pos:'正位', meaning:'充满希望的能量正在汇聚，宇宙给出了肯定的答案。相信自己的直觉，此刻是前进的好时机。内心的愿望与现实的走向正在对齐，保持敞开的心态，美好正在途中。',
-    art:(w,h)=>`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><circle cx="${w/2}" cy="${h*.4}" r="${w*.28}" stroke="#C09050" stroke-width="1.2"/><line x1="${w/2}" y1="${h*.08}" x2="${w/2}" y2="${h*.72}" stroke="#C09050" stroke-width=".8" opacity=".35"/><line x1="${w*.08}" y1="${h*.4}" x2="${w*.92}" y2="${h*.4}" stroke="#C09050" stroke-width=".8" opacity=".35"/><line x1="${w*.2}" y1="${h*.18}" x2="${w*.8}" y2="${h*.62}" stroke="#C09050" stroke-width=".8" opacity=".35"/><line x1="${w*.8}" y1="${h*.18}" x2="${w*.2}" y2="${h*.62}" stroke="#C09050" stroke-width=".8" opacity=".35"/><circle cx="${w/2}" cy="${h*.4}" r="${w*.09}" fill="#C09050" opacity=".12"/><circle cx="${w/2}" cy="${h*.4}" r="${w*.055}" fill="#C09050" opacity=".55"/><circle cx="${w/2}" cy="${h*.4}" r="${w*.022}" fill="#C09050"/><text x="${w/2}" y="${h*.88}" text-anchor="middle" font-size="${w*.11}" fill="#A09CB0" font-family="DM Sans,sans-serif" letter-spacing=".06em">THE STAR</text></svg>` },
-  no:    { ans:'No',    cls:'no',    card:'塔',   pos:'逆位', meaning:'根基有所动摇，此路暂时不通。这不是终点，而是一个提醒——放慢脚步，重新审视方向。当风暴平息，你会以更清醒的姿态重新出发。',
-    art:(w,h)=>`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><rect x="${w*.26}" y="${h*.14}" width="${w*.48}" height="${h*.42}" rx="2" stroke="#C09050" stroke-width="1.2"/><polygon points="${w*.26},${h*.14} ${w*.5},${h*.04} ${w*.74},${h*.14}" stroke="#C09050" stroke-width="1.2" fill="none"/><line x1="${w*.33}" y1="${h*.25}" x2="${w*.67}" y2="${h*.25}" stroke="#C09050" stroke-width=".8" opacity=".5"/><line x1="${w*.33}" y1="${h*.34}" x2="${w*.67}" y2="${h*.34}" stroke="#C09050" stroke-width=".8" opacity=".5"/><rect x="${w*.38}" y="${h*.44}" width="${w*.24}" height="${h*.12}" rx="1.5" stroke="#C09050" stroke-width=".9"/><text x="${w/2}" y="${h*.88}" text-anchor="middle" font-size="${w*.11}" fill="#A09CB0" font-family="DM Sans,sans-serif" letter-spacing=".06em">THE TOWER</text></svg>` },
-  maybe: { ans:'Maybe', cls:'maybe', card:'月亮', pos:'正位', meaning:'迷雾尚未完全散去，答案需要时间沉淀。保持耐心，倾听内心深处的声音。当时机成熟，方向自然会清晰。',
-    art:(w,h)=>`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><path d="M${w*.6} ${h*.07} A${w*.3} ${w*.3} 0 1 0 ${w*.6} ${h*.67} A${w*.18} ${w*.18} 0 1 1 ${w*.6} ${h*.07}Z" stroke="#C09050" stroke-width="1.2" fill="none"/><circle cx="${w*.27}" cy="${h*.62}" r="${w*.06}" stroke="#C09050" stroke-width=".9" fill="none"/><circle cx="${w*.46}" cy="${h*.68}" r="${w*.045}" stroke="#C09050" stroke-width=".9" fill="none"/><text x="${w/2}" y="${h*.88}" text-anchor="middle" font-size="${w*.11}" fill="#A09CB0" font-family="DM Sans,sans-serif" letter-spacing=".06em">THE MOON</text></svg>` },
+  yes:   { ans:'Yes',   cls:'yes',   card:'星星',
+    tagline:'那道光一直都在，它会照到你的',
+    meaning:'星星在风暴散去后静静高悬，光从未真正消失，只是有时被遮掩。宇宙给出了肯定，那道光一直都在，终会照到你。',
+    art:(w,h)=>`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><circle cx="${w/2}" cy="${h*.4}" r="${w*.28}" stroke="#C09050" stroke-width="1.2"/><line x1="${w/2}" y1="${h*.08}" x2="${w/2}" y2="${h*.72}" stroke="#C09050" stroke-width=".8" opacity=".35"/><line x1="${w*.08}" y1="${h*.4}" x2="${w*.92}" y2="${h*.4}" stroke="#C09050" stroke-width=".8" opacity=".35"/><line x1="${w*.2}" y1="${h*.18}" x2="${w*.8}" y2="${h*.62}" stroke="#C09050" stroke-width=".8" opacity=".35"/><line x1="${w*.8}" y1="${h*.18}" x2="${w*.2}" y2="${h*.62}" stroke="#C09050" stroke-width=".8" opacity=".35"/><circle cx="${w/2}" cy="${h*.4}" r="${w*.09}" fill="#C09050" opacity=".12"/><circle cx="${w/2}" cy="${h*.4}" r="${w*.055}" fill="#C09050" opacity=".55"/><circle cx="${w/2}" cy="${h*.4}" r="${w*.022}" fill="#C09050"/></svg>` },
+  no:    { ans:'No',    cls:'no',    card:'塔',
+    tagline:'倒塌是为了让更坚实的东西重建',
+    meaning:'塔在雷击中轰然崩落，旧有的结构在瞬间碎裂。这不是终结，是清场。放下眼前的，是为了让更深的根基重新生长。',
+    art:(w,h)=>`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><rect x="${w*.26}" y="${h*.14}" width="${w*.48}" height="${h*.42}" rx="2" stroke="#C09050" stroke-width="1.2"/><polygon points="${w*.26},${h*.14} ${w*.5},${h*.04} ${w*.74},${h*.14}" stroke="#C09050" stroke-width="1.2" fill="none"/><line x1="${w*.33}" y1="${h*.25}" x2="${w*.67}" y2="${h*.25}" stroke="#C09050" stroke-width=".8" opacity=".5"/><line x1="${w*.33}" y1="${h*.34}" x2="${w*.67}" y2="${h*.34}" stroke="#C09050" stroke-width=".8" opacity=".5"/><rect x="${w*.38}" y="${h*.44}" width="${w*.24}" height="${h*.12}" rx="1.5" stroke="#C09050" stroke-width=".9"/></svg>` },
+  maybe: { ans:'Maybe', cls:'maybe', card:'月亮',
+    tagline:'看不清没关系，慢一点自然会清',
+    meaning:'月亮将一切映照得若隐若现，道路在银光与阴影中蜿蜒向前。看不清不是停步的理由，走慢一些，眼睛自然会适应。',
+    art:(w,h)=>`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><path d="M${w*.6} ${h*.07} A${w*.3} ${w*.3} 0 1 0 ${w*.6} ${h*.67} A${w*.18} ${w*.18} 0 1 1 ${w*.6} ${h*.07}Z" stroke="#C09050" stroke-width="1.2" fill="none"/><circle cx="${w*.27}" cy="${h*.62}" r="${w*.06}" stroke="#C09050" stroke-width=".9" fill="none"/><circle cx="${w*.46}" cy="${h*.68}" r="${w*.045}" stroke="#C09050" stroke-width=".9" fill="none"/></svg>` },
 };
 
 const origins = {
@@ -563,11 +569,10 @@ function openDetail(key) {
     <div class="det-card-wrap">
       <div class="det-big-card">${c.art(96,154)}</div>
       <div class="det-card-name">${c.card}</div>
-      <div class="det-pos-chip">${c.pos}</div>
     </div>
+    <div style="text-align:center;font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--text-dark);padding:14px 24px 0;line-height:1.3;">${c.tagline}</div>
     <hr class="det-divider">
     <div class="det-meaning">
-      <div class="det-meaning-label">牌意解读</div>
       <div class="det-meaning-text">${c.meaning}</div>
     </div>
   `;
