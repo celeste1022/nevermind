@@ -425,13 +425,7 @@ async function pickCard(idx){
   });
   await dl(350);
 
-  // 移到中央
-  const c=$(`fc${idx}`);
-  c.style.transition='left .45s cubic-bezier(.22,1,.36,1),top .45s cubic-bezier(.22,1,.36,1)';
-  c.style.left='135px';c.style.top='21px';
-  await dl(460);
-
-  // 翻牌
+  // 翻牌（原地）
   const f=$(`ff${idx}`);
   f.innerHTML=deal[idx].art(40,64);
   await flipCard(idx);
