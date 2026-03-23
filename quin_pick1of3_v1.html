@@ -20,12 +20,11 @@ body{background:var(--bg);min-height:100vh;display:flex;flex-direction:column;al
 .pg-sub{font-size:11px;color:var(--lt);letter-spacing:.12em;text-transform:uppercase;margin-top:4px;text-align:center}
 .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;background:rgba(192,144,80,.1);font-size:10px;font-weight:600;color:var(--gold);letter-spacing:.05em;margin-top:6px}
 
-/* ── Widget ── */
 .widget{width:329px;height:155px;background:var(--wb);border-radius:var(--r);box-shadow:var(--sh);position:relative;overflow:hidden;user-select:none}
 .screen{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .32s ease}
 .screen.on{opacity:1;pointer-events:all}
 
-/* ══ S0: INITIAL ══ */
+/* S0 */
 #s0{display:flex;align-items:center}
 .s0l{padding-left:20px;width:175px;display:flex;flex-direction:column;justify-content:center;gap:7px;transition:transform .34s cubic-bezier(.4,0,1,1),opacity .28s ease;cursor:pointer}
 .s0-title{font-family:'Cormorant Garamond',serif;font-size:27px;font-weight:600;color:var(--dk);line-height:1}
@@ -40,24 +39,17 @@ body{background:var(--bg);min-height:100vh;display:flex;flex-direction:column;al
 .dk-pulse{position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:58px;height:10px;border-radius:50%;background:radial-gradient(ellipse,rgba(192,144,80,.22) 0%,transparent 70%);animation:pulse 2.4s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:.3;transform:translateX(-50%) scaleX(1)}50%{opacity:.8;transform:translateX(-50%) scaleX(1.25)}}
 
-/* ══ S1: 3 CARDS FACE DOWN — user picks one ══
-   Cards: 60×96, centered group
-   top=21, name top=10, kw area unused in pick phase
-   L=49 C=135 R=221 (gap=26px, side=32px)
-*/
+/* S1 */
 #s1{background:var(--wb)}
 #stage{position:absolute;inset:0}
-
 .fc{
-  position:absolute;
-  width:60px;height:96px;border-radius:8px;
+  position:absolute;width:60px;height:96px;border-radius:8px;
   background:linear-gradient(155deg,#22203A 0%,#16142C 100%);
   border:1px solid #2E2B4A;
   box-shadow:0 5px 18px rgba(10,8,26,.32),inset 0 1px 0 rgba(255,255,255,.07);
   overflow:hidden;cursor:pointer;
-  left:135px;top:21px; /* start stacked at C */
-  transition:left .48s cubic-bezier(.22,1,.36,1),top .48s cubic-bezier(.22,1,.36,1),
-             opacity .35s ease,transform .35s ease,box-shadow .35s ease;
+  left:135px;top:21px;
+  transition:left .48s cubic-bezier(.22,1,.36,1),top .48s cubic-bezier(.22,1,.36,1),opacity .35s ease,transform .35s ease,box-shadow .35s ease;
 }
 .fc::before{content:'';position:absolute;inset:6px;border:1px solid rgba(192,144,80,.25);border-radius:4px}
 .fc-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) translateY(-5px);width:22px;height:22px;border-radius:50%;border:1px solid rgba(192,144,80,.4)}
@@ -68,68 +60,49 @@ body{background:var(--bg);min-height:100vh;display:flex;flex-direction:column;al
 .sp::before{content:'';position:absolute;inset:0;border-radius:50%;border:1.6px solid rgba(255,255,255,.1)}
 .sp::after{content:'';position:absolute;inset:0;border-radius:50%;border:1.6px solid transparent;border-top-color:var(--gold);border-right-color:rgba(192,144,80,.25);animation:spin .85s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* Hover glow on pickable cards */
 .fc.pickable:hover{box-shadow:0 6px 24px rgba(192,144,80,.35),inset 0 1px 0 rgba(255,255,255,.1);transform:translateY(-3px)}
 .fc.pickable:active{transform:translateY(-1px)}
-
-/* Pick hint */
-#pick-hint{
-  position:absolute;bottom:12px;left:0;right:0;
-  text-align:center;font-size:10px;color:var(--mid);letter-spacing:.07em;
-  opacity:0;transition:opacity .35s ease;
-  animation:hintPulse 2.2s ease-in-out infinite;
-}
+#pick-hint{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:10px;color:var(--mid);letter-spacing:.07em;opacity:0;transition:opacity .35s ease;animation:hintPulse 2.2s ease-in-out infinite}
 @keyframes hintPulse{0%,100%{opacity:.45}50%{opacity:.95}}
 
-/* ══ S2: DONE ══
-   Version A: Big Yes/No answer + one-line tagline below
-*/
-#s2{}
-.done-left{
-  position:absolute;left:22px;top:0;bottom:0;width:175px;
-  display:flex;flex-direction:column;justify-content:center;gap:5px;
-}
+/* S2 */
+.done-left{position:absolute;left:22px;top:0;bottom:0;width:175px;display:flex;flex-direction:column;justify-content:center;gap:5px}
 .done-label{font-size:9px;color:var(--lt);letter-spacing:.1em;text-transform:uppercase;opacity:0;transition:opacity .3s ease}
 .done-answer{font-family:'Cormorant Garamond',serif;font-size:56px;font-weight:600;line-height:.92;opacity:0;transition:opacity 1s cubic-bezier(.4,0,.2,1)}
 .done-answer.yes{color:var(--yes)}.done-answer.no{color:var(--no)}.done-answer.maybe{color:var(--maybe)}
 .done-tagline{font-family:'Cormorant Garamond',serif;font-size:12px;font-style:italic;color:var(--mid);line-height:1.4;opacity:0;transition:opacity .8s ease .4s}
 #done-cta{display:inline-flex;align-items:center;padding:5px 12px;border-radius:18px;font-size:9.5px;font-weight:500;border:none;cursor:pointer;color:#fff;background:var(--gold);font-family:'DM Sans',sans-serif;opacity:0;transition:opacity .5s ease;width:fit-content;margin-top:3px}
 #done-cta:active{transform:scale(.96)}
-
 .done-right{position:absolute;right:14px;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
 .done-card{width:52px;height:82px;border-radius:7px;background:var(--cb);border:1px solid var(--cbr);box-shadow:0 4px 14px rgba(28,26,46,.1);display:flex;align-items:center;justify-content:center;overflow:hidden;opacity:0;transition:opacity .4s ease}
-.done-card-name{font-size:8px;color:var(--lt);text-align:center;line-height:1.3;opacity:0;transition:opacity .3s ease}
+.done-card-name{font-size:7.5px;color:var(--lt);text-align:center;line-height:1.4;opacity:0;transition:opacity .3s ease}
 #done-reset{position:absolute;top:9px;right:9px;width:22px;height:22px;border-radius:50%;background:rgba(160,156,176,.12);border:none;cursor:pointer;z-index:30;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--mid);opacity:0;pointer-events:none;transition:opacity .28s,background .15s}
 #done-reset:hover{background:rgba(160,156,176,.22)}
 
-/* Shimmer */
 .shimmer::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);animation:shimmer .26s ease-in-out forwards;border-radius:inherit}
 @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(140%)}}
-
-/* Fan reform */
 @keyframes spreadIn{from{transform:rotate(var(--rv)) scale(.1) translateY(8px);opacity:0}60%{opacity:1}to{transform:rotate(var(--rv)) scale(1) translateY(0);opacity:1}}
 .dk1{--rv:-5deg}.dk2{--rv:-1deg}.dk3{--rv:4deg}
 .dk-card.reform{animation:spreadIn .5s cubic-bezier(.34,1.3,.64,1) both}
 
-/* Controls */
 .controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 .cb{padding:7px 16px;border-radius:24px;border:1.5px solid #D6D0C8;background:transparent;font-size:12px;color:var(--mid);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
 .cb:hover:not(.on){border-color:var(--dk);color:var(--dk)}
 .cb.on{background:var(--dk);color:#fff;border-color:var(--dk)}
+.cb.yes-on{background:var(--yes);color:#fff;border-color:var(--yes)}
+.cb.no-on{background:var(--no);color:#fff;border-color:var(--no)}
+.cb.maybe-on{background:var(--maybe);color:#fff;border-color:var(--maybe)}
 .step-row{display:flex;align-items:center;gap:8px}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--cbr);transition:background .3s,transform .3s}
 .dot.on{background:var(--gold);transform:scale(1.3)}
 .hint{font-size:11px;color:var(--lt);text-align:center;max-width:329px;line-height:1.7}
-.note{max-width:329px;background:rgba(192,144,80,.06);border:1px solid rgba(192,144,80,.18);border-radius:12px;padding:12px 16px;font-size:10.5px;color:var(--mid);line-height:1.7}
-.note strong{color:var(--gold);font-weight:600}
 </style>
 </head>
 <body>
 
 <div style="text-align:center">
   <div class="pg-title">Quin · 快速决策</div>
-  <div class="pg-sub">选一张 · 版本 A — 大字答案</div>
+  <div class="pg-sub">选一张 · 版本 A</div>
   <div class="badge">点一下出3张 · 用户选1张</div>
 </div>
 
@@ -140,22 +113,17 @@ body{background:var(--bg);min-height:100vh;display:flex;flex-direction:column;al
 </div>
 
 <div class="widget" id="widget">
-
-  <!-- S0 -->
   <div class="screen on" id="s0">
     <div class="s0l" id="s0l" onclick="goS1()">
       <div class="s0-title">快速决策</div>
       <div class="s0-sub">默念心中之问<br>轻触，为你展开三张</div>
     </div>
     <div class="s0-deck" id="s0d" onclick="goS1()">
-      <div class="dk-card dk1"></div>
-      <div class="dk-card dk2"></div>
-      <div class="dk-card dk3"></div>
+      <div class="dk-card dk1"></div><div class="dk-card dk2"></div><div class="dk-card dk3"></div>
       <div class="dk-pulse"></div>
     </div>
   </div>
 
-  <!-- S1: 3 cards face down -->
   <div class="screen" id="s1">
     <div id="stage">
       <div class="fc" id="fc0"><div class="fc-ring"></div><div class="fc-dia"></div><div class="fc-face" id="ff0"></div><div class="fc-spin" id="fs0"><div class="sp"></div></div></div>
@@ -165,7 +133,6 @@ body{background:var(--bg);min-height:100vh;display:flex;flex-direction:column;al
     </div>
   </div>
 
-  <!-- S2: Done -->
   <div class="screen" id="s2">
     <div class="done-left">
       <div class="done-label" id="done-label">快速决策</div>
@@ -179,38 +146,216 @@ body{background:var(--bg);min-height:100vh;display:flex;flex-direction:column;al
     </div>
     <button id="done-reset" onclick="event.stopPropagation();doReset()">↺</button>
   </div>
-
 </div>
 
 <div class="controls">
   <button class="cb on" id="cb0" onclick="jump(0)">初始态</button>
-  <button class="cb"    id="cb1" onclick="jump(1)">三牌展开</button>
-  <button class="cb"    id="cb2" onclick="jump(2)">完成态</button>
+  <button class="cb" id="cb1" onclick="jump(1)">三牌展开</button>
+  <button class="cb" id="cb-yes" onclick="jumpDone('yes')">Yes</button>
+  <button class="cb" id="cb-no" onclick="jumpDone('no')">No</button>
+  <button class="cb" id="cb-maybe" onclick="jumpDone('maybe')">Maybe</button>
 </div>
-<p class="hint">点击整个组件展开三张 · 再点其中一张选牌</p>
-<div class="note"><strong>版本 A</strong>：完成态左侧 = 大字 Yes / No / Maybe + 一句牌意短话</div>
+<p class="hint">点击组件展开三张 · 再点其中一张选牌</p>
 
 <script>
 const dl=ms=>new Promise(r=>setTimeout(r,ms));
 const $=id=>document.getElementById(id);
 
-/* ── Card data ── */
-const CARDS=[
-  {name:'星星·正位', cls:'yes',   ans:'Yes',   tagline:'希望已在途中，勇敢迈出这一步', art:starSVG},
-  {name:'塔·逆位',   cls:'no',    ans:'No',    tagline:'此刻放手，是为了更好地重来', art:towerSVG},
-  {name:'月亮·正位', cls:'maybe', ans:'Maybe', tagline:'迷雾中有答案，耐心等待清晰', art:moonSVG},
-  {name:'太阳·正位', cls:'yes',   ans:'Yes',   tagline:'光芒照耀前路，放心向前走', art:sunSVG},
-  {name:'命运之轮',  cls:'maybe', ans:'Maybe', tagline:'时机正在转动，静待最佳时刻', art:wheelSVG},
-  {name:'高塔·正位', cls:'no',    ans:'No',    tagline:'旧有结构需要打破，才能重建', art:towerSVG},
+/* ── 78张完整牌库 ── */
+const DECK=[
+  // 大阿尔克那
+  {name:'愚者',      cls:'maybe', ans:'Maybe', tagline:'新旅程在脚下，带着好奇踏出去', art:fool},
+  {name:'魔术师',    cls:'yes',   ans:'Yes',   tagline:'一切已在手中，是时候行动了',   art:magician},
+  {name:'女祭司',    cls:'maybe', ans:'Maybe', tagline:'答案藏在内心，静待直觉浮现',   art:priestess},
+  {name:'皇后',      cls:'yes',   ans:'Yes',   tagline:'丰盛正在涌来，放心去接纳它',   art:empress},
+  {name:'皇帝',      cls:'yes',   ans:'Yes',   tagline:'根基已经稳固，大胆往前迈进',   art:emperor},
+  {name:'教皇',      cls:'maybe', ans:'Maybe', tagline:'循规有其智慧，看清再做决定',   art:hierophant},
+  {name:'恋人',      cls:'yes',   ans:'Yes',   tagline:'心与心已共鸣，跟随真实感受',   art:lovers},
+  {name:'战车',      cls:'maybe', ans:'Maybe', tagline:'胜利触手可及，专注才能抵达',   art:chariot},
+  {name:'力量',      cls:'yes',   ans:'Yes',   tagline:'温柔是真力量，带着它向前走',   art:strength},
+  {name:'隐士',      cls:'no',    ans:'No',    tagline:'此刻需要独处，先向内再向外',   art:hermit},
+  {name:'命运之轮',  cls:'maybe', ans:'Maybe', tagline:'轮盘正在转动，时机未到且等',   art:wheel},
+  {name:'正义',      cls:'maybe', ans:'Maybe', tagline:'天平正在衡量，公平自会揭晓',   art:justice},
+  {name:'倒吊人',    cls:'no',    ans:'No',    tagline:'换一个角度看，暂停比前进好',   art:hangedman},
+  {name:'死神',      cls:'no',    ans:'No',    tagline:'旧章节在结束，等待新的开始',   art:death},
+  {name:'节制',      cls:'maybe', ans:'Maybe', tagline:'慢慢调和才稳，耐心找到平衡',   art:temperance},
+  {name:'恶魔',      cls:'no',    ans:'No',    tagline:'束缚已久该断，先看清再行动',   art:devil},
+  {name:'塔',        cls:'no',    ans:'No',    tagline:'根基需要重建，此路暂时不通',   art:tower},
+  {name:'星星',      cls:'yes',   ans:'Yes',   tagline:'希望已在途中，勇敢迈出这步',   art:star},
+  {name:'月亮',      cls:'maybe', ans:'Maybe', tagline:'迷雾中有答案，耐心等待清晰',   art:moon},
+  {name:'太阳',      cls:'yes',   ans:'Yes',   tagline:'光芒照耀前路，放心向前走吧',   art:sun},
+  {name:'审判',      cls:'maybe', ans:'Maybe', tagline:'觉醒时刻将至，听从内心召唤',   art:judgement},
+  {name:'世界',      cls:'yes',   ans:'Yes',   tagline:'圆满已经到来，尽情去拥抱它',   art:world},
+  // 权杖
+  {name:'权杖王牌',  cls:'yes',   ans:'Yes',   tagline:'创意之火点燃，立刻付诸行动',   art:wandsAce},
+  {name:'权杖二',    cls:'maybe', ans:'Maybe', tagline:'方向尚在规划，先看清再出发',   art:wands2},
+  {name:'权杖三',    cls:'yes',   ans:'Yes',   tagline:'视野已经打开，扬帆正当其时',   art:wands3},
+  {name:'权杖四',    cls:'yes',   ans:'Yes',   tagline:'收获的喜悦来，庆祝这个时刻',   art:wands4},
+  {name:'权杖五',    cls:'no',    ans:'No',    tagline:'竞争让人疲惫，暂退一步再看',   art:wands5},
+  {name:'权杖六',    cls:'yes',   ans:'Yes',   tagline:'胜利已经在望，继续保持前进',   art:wands6},
+  {name:'权杖七',    cls:'maybe', ans:'Maybe', tagline:'坚守需要代价，评估再做决定',   art:wands7},
+  {name:'权杖八',    cls:'yes',   ans:'Yes',   tagline:'速度与你同行，快速推进此事',   art:wands8},
+  {name:'权杖九',    cls:'maybe', ans:'Maybe', tagline:'已经很努力了，休整再做判断',   art:wands9},
+  {name:'权杖十',    cls:'no',    ans:'No',    tagline:'负担已经太重，放下一些再走',   art:wands10},
+  {name:'权杖侍从',  cls:'yes',   ans:'Yes',   tagline:'热情点亮前路，大胆去探索吧',   art:wandsPage},
+  {name:'权杖骑士',  cls:'yes',   ans:'Yes',   tagline:'勇气驱动前行，行动比等待好',   art:wandsKnight},
+  {name:'权杖王后',  cls:'yes',   ans:'Yes',   tagline:'魅力与智慧并，自信地向前走',   art:wandsQueen},
+  {name:'权杖国王',  cls:'yes',   ans:'Yes',   tagline:'领导力已就位，果断做出决定',   art:wandsKing},
+  // 圣杯
+  {name:'圣杯王牌',  cls:'yes',   ans:'Yes',   tagline:'情感的门已开，敞开心去感受',   art:cupsAce},
+  {name:'圣杯二',    cls:'yes',   ans:'Yes',   tagline:'心心相印时刻，相信这份连接',   art:cups2},
+  {name:'圣杯三',    cls:'yes',   ans:'Yes',   tagline:'喜悦与人共享，值得好好庆祝',   art:cups3},
+  {name:'圣杯四',    cls:'no',    ans:'No',    tagline:'内心尚未准备，给自己多些时',   art:cups4},
+  {name:'圣杯五',    cls:'no',    ans:'No',    tagline:'失落还需消化，先疗愈再向前',   art:cups5},
+  {name:'圣杯六',    cls:'maybe', ans:'Maybe', tagline:'过去温柔提醒，当下才是重心',   art:cups6},
+  {name:'圣杯七',    cls:'maybe', ans:'Maybe', tagline:'选择如此之多，看清幻象再动',   art:cups7},
+  {name:'圣杯八',    cls:'no',    ans:'No',    tagline:'是时候转身走，放下才能找到',   art:cups8},
+  {name:'圣杯九',    cls:'yes',   ans:'Yes',   tagline:'心愿正在实现，放心去接纳它',   art:cups9},
+  {name:'圣杯十',    cls:'yes',   ans:'Yes',   tagline:'圆满触手可及，用心去珍惜它',   art:cups10},
+  {name:'圣杯侍从',  cls:'yes',   ans:'Yes',   tagline:'直觉轻声呼唤，跟随它往前走',   art:cupsPage},
+  {name:'圣杯骑士',  cls:'yes',   ans:'Yes',   tagline:'浪漫与真诚并，带着心去行动',   art:cupsKnight},
+  {name:'圣杯王后',  cls:'yes',   ans:'Yes',   tagline:'温柔滋养万物，相信你的感受',   art:cupsQueen},
+  {name:'圣杯国王',  cls:'yes',   ans:'Yes',   tagline:'情感已经成熟，智慧引领方向',   art:cupsKing},
+  // 宝剑
+  {name:'宝剑王牌',  cls:'yes',   ans:'Yes',   tagline:'清晰的真相来，切断疑惑前行',   art:swordsAce},
+  {name:'宝剑二',    cls:'maybe', ans:'Maybe', tagline:'两难需要权衡，给自己时间想',   art:swords2},
+  {name:'宝剑三',    cls:'no',    ans:'No',    tagline:'心痛需要被看，先好好疗愈吧',   art:swords3},
+  {name:'宝剑四',    cls:'no',    ans:'No',    tagline:'休息不是退缩，恢复再重新来',   art:swords4},
+  {name:'宝剑五',    cls:'no',    ans:'No',    tagline:'争斗只留伤痕，退出比赢更好',   art:swords5},
+  {name:'宝剑六',    cls:'maybe', ans:'Maybe', tagline:'离开是为了到，渡过才能抵岸',   art:swords6},
+  {name:'宝剑七',    cls:'no',    ans:'No',    tagline:'捷径暗藏风险，诚实才是正路',   art:swords7},
+  {name:'宝剑八',    cls:'no',    ans:'No',    tagline:'困住你的是念，松开思维解脱',   art:swords8},
+  {name:'宝剑九',    cls:'no',    ans:'No',    tagline:'焦虑放大了忧，先好好睡一觉',   art:swords9},
+  {name:'宝剑十',    cls:'no',    ans:'No',    tagline:'最低谷已到来，只有向上的路',   art:swords10},
+  {name:'宝剑侍从',  cls:'maybe', ans:'Maybe', tagline:'信息尚未齐全，多观察再行动',   art:swordsPage},
+  {name:'宝剑骑士',  cls:'yes',   ans:'Yes',   tagline:'速度与决断力，快速切入要点',   art:swordsKnight},
+  {name:'宝剑王后',  cls:'maybe', ans:'Maybe', tagline:'理智先于情感，看清再做选择',   art:swordsQueen},
+  {name:'宝剑国王',  cls:'yes',   ans:'Yes',   tagline:'清晰的判断力，果断给出答案',   art:swordsKing},
+  // 星币
+  {name:'星币王牌',  cls:'yes',   ans:'Yes',   tagline:'实际的机会来，踏实地去抓住',   art:pentaclesAce},
+  {name:'星币二',    cls:'maybe', ans:'Maybe', tagline:'平衡需要练习，找到节奏再动',   art:pentacles2},
+  {name:'星币三',    cls:'yes',   ans:'Yes',   tagline:'合作产生力量，一起去实现它',   art:pentacles3},
+  {name:'星币四',    cls:'no',    ans:'No',    tagline:'过度执着于有，放开手才自由',   art:pentacles4},
+  {name:'星币五',    cls:'no',    ans:'No',    tagline:'困境中仍有援，先低头寻帮助',   art:pentacles5},
+  {name:'星币六',    cls:'yes',   ans:'Yes',   tagline:'给予与接受流，善意正在流动',   art:pentacles6},
+  {name:'星币七',    cls:'maybe', ans:'Maybe', tagline:'投入已久该看，评估成果再定',   art:pentacles7},
+  {name:'星币八',    cls:'yes',   ans:'Yes',   tagline:'工匠精神在此，专注打磨前行',   art:pentacles8},
+  {name:'星币九',    cls:'yes',   ans:'Yes',   tagline:'独立与富足来，享受你的成果',   art:pentacles9},
+  {name:'星币十',    cls:'yes',   ans:'Yes',   tagline:'长久的积累在，传承正在到来',   art:pentacles10},
+  {name:'星币侍从',  cls:'yes',   ans:'Yes',   tagline:'好奇与勤勉并，认真学习成长',   art:pentaclesPage},
+  {name:'星币骑士',  cls:'maybe', ans:'Maybe', tagline:'稳健胜过急进，慢慢才能走远',   art:pentaclesKnight},
+  {name:'星币王后',  cls:'yes',   ans:'Yes',   tagline:'务实与温暖并，照顾好再出发',   art:pentaclesQueen},
+  {name:'星币国王',  cls:'yes',   ans:'Yes',   tagline:'稳固的根基在，放心去做决定',   art:pentaclesKing},
 ];
 
-function starSVG(w,h){return`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><circle cx="${w/2}" cy="${h*.42}" r="${w*.28}" stroke="#C09050" stroke-width="1"/><line x1="${w/2}" y1="${h*.1}" x2="${w/2}" y2="${h*.74}" stroke="#C09050" stroke-width=".7" opacity=".3"/><line x1="${w*.1}" y1="${h*.42}" x2="${w*.9}" y2="${h*.42}" stroke="#C09050" stroke-width=".7" opacity=".3"/><circle cx="${w/2}" cy="${h*.42}" r="${w*.07}" fill="#C09050" opacity=".55"/><circle cx="${w/2}" cy="${h*.42}" r="${w*.025}" fill="#C09050"/><text x="${w/2}" y="${h*.9}" text-anchor="middle" font-size="${w*.13}" fill="#A09CB0" font-family="DM Sans">STAR</text></svg>`;}
-function towerSVG(w,h){return`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><rect x="${w*.27}" y="${h*.15}" width="${w*.46}" height="${h*.4}" rx="1.5" stroke="#C09050" stroke-width="1"/><polygon points="${w*.27},${h*.15} ${w*.5},${h*.04} ${w*.73},${h*.15}" stroke="#C09050" stroke-width="1" fill="none"/><line x1="${w*.35}" y1="${h*.27}" x2="${w*.65}" y2="${h*.27}" stroke="#C09050" stroke-width=".7" opacity=".5"/><text x="${w/2}" y="${h*.9}" text-anchor="middle" font-size="${w*.13}" fill="#A09CB0" font-family="DM Sans">TOWER</text></svg>`;}
-function moonSVG(w,h){return`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><path d="M${w*.6} ${h*.08} A${w*.3} ${w*.3} 0 1 0 ${w*.6} ${h*.68} A${w*.18} ${w*.18} 0 1 1 ${w*.6} ${h*.08}Z" stroke="#C09050" stroke-width="1" fill="none"/><text x="${w/2}" y="${h*.9}" text-anchor="middle" font-size="${w*.13}" fill="#A09CB0" font-family="DM Sans">MOON</text></svg>`;}
-function sunSVG(w,h){const cx=w/2,cy=h*.38,r=w*.18;const rays=[0,45,90,135,180,225,270,315].map(a=>`<line x1="${cx+Math.cos(a*Math.PI/180)*(r+3)}" y1="${cy+Math.sin(a*Math.PI/180)*(r+3)}" x2="${cx+Math.cos(a*Math.PI/180)*(r+8)}" y2="${cy+Math.sin(a*Math.PI/180)*(r+8)}" stroke="#C09050" stroke-width=".8" opacity=".5"/>`).join('');return`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><circle cx="${cx}" cy="${cy}" r="${r}" stroke="#C09050" stroke-width="1"/><circle cx="${cx}" cy="${cy}" r="${r*.5}" fill="#C09050" opacity=".2"/>${rays}<text x="${w/2}" y="${h*.9}" text-anchor="middle" font-size="${w*.13}" fill="#A09CB0" font-family="DM Sans">SUN</text></svg>`;}
-function wheelSVG(w,h){const cx=w/2,cy=h*.4,r1=w*.26,r2=w*.1;const sp=[0,45,90,135].map(a=>{const c=Math.cos(a*Math.PI/180),s=Math.sin(a*Math.PI/180);return`<line x1="${cx+c*r2}" y1="${cy+s*r2}" x2="${cx+c*r1}" y2="${cy+s*r1}" stroke="#C09050" stroke-width=".7" opacity=".5"/><line x1="${cx-c*r2}" y1="${cy-s*r2}" x2="${cx-c*r1}" y2="${cy-s*r1}" stroke="#C09050" stroke-width=".7" opacity=".5"/>`}).join('');return`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><circle cx="${cx}" cy="${cy}" r="${r1}" stroke="#C09050" stroke-width="1"/><circle cx="${cx}" cy="${cy}" r="${r2}" stroke="#C09050" stroke-width=".7"/>${sp}<text x="${w/2}" y="${h*.9}" text-anchor="middle" font-size="${w*.13}" fill="#A09CB0" font-family="DM Sans">WHEEL</text></svg>`;}
+/* ── SVG 牌面绘制函数 ── */
+function mkSVG(w,h,paths){return`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none" xmlns="http://www.w3.org/2000/svg">${paths}<text x="${w/2}" y="${h*.91}" text-anchor="middle" font-size="${w*.115}" fill="#A09CB0" font-family="DM Sans,sans-serif" letter-spacing=".04em"></text></svg>`;}
+const s='#C09050',sw='stroke="#C09050"',sw1=`stroke="${s}" stroke-width="1"`,sw12=`stroke="${s}" stroke-width="1.2"`;
+// 共用图形组件
+const circle=(cx,cy,r,op='')=>`<circle cx="${cx}" cy="${cy}" r="${r}" ${sw12} fill="none" ${op}/>`;
+const line=(x1,y1,x2,y2,op='.35')=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" ${sw1} opacity="${op}"/>`;
+const rect=(x,y,w,h,rx=2)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" ${sw12} fill="none"/>`;
+const dot=(cx,cy,r,op='.55')=>`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${s}" opacity="${op}"/>`;
 
-/* ── Positions ── */
+// 星形
+function starShape(cx,cy,r,pts=5){const a=[];for(let i=0;i<pts*2;i++){const ang=i*Math.PI/pts-Math.PI/2;const rr=i%2===0?r:r*.4;a.push(`${cx+Math.cos(ang)*rr},${cy+Math.sin(ang)*rr}`);}return`<polygon points="${a.join(' ')}" ${sw1} fill="none"/>`;}
+
+// 每张牌的独立绘制函数 (w, h 参数化)
+function fool(w,h){const cx=w/2,cy=h*.38;return mkSVG(w,h,`${circle(cx,cy,w*.22)}${line(cx,h*.14,cx,h*.62)}<path d="M${cx-w*.18} ${h*.28} Q${cx} ${h*.18} ${cx+w*.18} ${h*.28}" ${sw1} fill="none"/>${dot(cx,cy,w*.04)}<path d="M${cx} ${h*.6} L${cx-w*.12} ${h*.72} M${cx} ${h*.6} L${cx+w*.12} ${h*.72}" ${sw12} stroke-linecap="round"/>`);}
+function magician(w,h){const cx=w/2,cy=h*.35;return mkSVG(w,h,`${circle(cx,cy,w*.2)}${dot(cx,cy,w*.06)}${line(cx,h*.12,cx,h*.18,.6)}${line(cx-w*.22,cy,cx-w*.12,cy,.5)}${line(cx+w*.12,cy,cx+w*.22,cy,.5)}<text x="${cx}" y="${h*.66}" text-anchor="middle" font-size="${w*.32}" fill="${s}" opacity=".15" font-family="DM Sans">∞</text>`);}
+function priestess(w,h){const cx=w/2;return mkSVG(w,h,`${circle(cx,h*.28,w*.15)}${line(cx,h*.44,cx,h*.68)}${line(cx-w*.18,h*.38,cx+w*.18,h*.38,.4)}<path d="M${cx-w*.12} ${h*.68} Q${cx} ${h*.78} ${cx+w*.12} ${h*.68}" ${sw1} fill="none" opacity=".5"/>${dot(cx,h*.28,w*.04)}`);}
+function empress(w,h){const cx=w/2,cy=h*.36;return mkSVG(w,h,`${circle(cx,cy,w*.24)}<path d="M${cx-w*.14} ${h*.22} Q${cx} ${h*.1} ${cx+w*.14} ${h*.22}" ${sw1} fill="none"/>${dot(cx,cy,w*.07,.4)}${dot(cx,cy,w*.035)}<path d="M${cx-w*.1} ${h*.6} L${cx} ${h*.72} L${cx+w*.1} ${h*.6}" ${sw1} fill="none" opacity=".4"/>`);}
+function emperor(w,h){const cx=w/2;return mkSVG(w,h,`${rect(cx-w*.22,h*.12,w*.44,h*.5,3)}${line(cx-w*.22,h*.28,cx+w*.22,h*.28,.5)}${line(cx,h*.12,cx,h*.62,.3)}${dot(cx,h*.37,w*.04)}`);}
+function hierophant(w,h){const cx=w/2;return mkSVG(w,h,`${circle(cx,h*.25,w*.13)}${line(cx,h*.38,cx,h*.65)}${line(cx-w*.18,h*.45,cx+w*.18,h*.45,.5)}${line(cx-w*.18,h*.54,cx+w*.18,h*.54,.4)}<path d="M${cx-w*.1} ${h*.65} L${cx+w*.1} ${h*.65}" ${sw1} opacity=".6"/>${dot(cx,h*.25,w*.04)}`);}
+function lovers(w,h){const cx=w/2;return mkSVG(w,h,`${circle(cx-w*.14,h*.35,w*.12)}${circle(cx+w*.14,h*.35,w*.12)}<path d="M${cx} ${h*.16} L${cx+w*.07} ${h*.24} L${cx} ${h*.32} L${cx-w*.07} ${h*.24} Z" ${sw1} fill="${s}" opacity=".18"/>${line(cx-w*.04,h*.35,cx+w*.04,h*.35,.5)}`);}
+function chariot(w,h){const cx=w/2;return mkSVG(w,h,`${rect(cx-w*.22,h*.14,w*.44,h*.35,2)}<path d="M${cx-w*.22} ${h*.49} L${cx-w*.22} ${h*.64} M${cx+w*.22} ${h*.49} L${cx+w*.22} ${h*.64}" ${sw1}/>${circle(cx-w*.12,h*.7,w*.1)}${circle(cx+w*.12,h*.7,w*.1)}${line(cx-w*.22,h*.49,cx+w*.22,h*.49,.5)}`);}
+function strength(w,h){const cx=w/2,cy=h*.4;return mkSVG(w,h,`<ellipse cx="${cx}" cy="${cy}" rx="${w*.22}" ry="${w*.14}" ${sw12} fill="none"/><path d="M${cx-w*.22} ${cy} Q${cx} ${h*.24} ${cx+w*.22} ${cy}" ${sw1} fill="none"/><path d="M${cx} ${h*.24} Q${cx+w*.12} ${h*.14} ${cx+w*.08} ${h*.08}" ${sw1} fill="none" opacity=".6"/>`);}
+function hermit(w,h){const cx=w/2;return mkSVG(w,h,`${circle(cx,h*.22,w*.12)}<line x1="${cx}" y1="${h*.34}" x2="${cx}" y2="${h*.62}" ${sw12}/><line x1="${cx-w*.18}" y1="${h*.44}" x2="${cx+w*.18}" y2="${h*.44}" ${sw12}/><line x1="${cx}" y1="${h*.62}" x2="${cx-w*.14}" y2="${h*.76}" ${sw12}/><line x1="${cx}" y1="${h*.62}" x2="${cx+w*.14}" y2="${h*.76}" ${sw12}/><polygon points="${cx+w*.14},${h*.3} ${cx+w*.26},${h*.36} ${cx+w*.2},${h*.24}" ${sw1} fill="${s}" opacity=".12"/>`);}
+function wheel(w,h){const cx=w/2,cy=h*.4,r1=w*.26,r2=w*.1;const sp=[0,45,90,135].map(a=>{const c=Math.cos(a*Math.PI/180),ss=Math.sin(a*Math.PI/180);return`<line x1="${cx+c*r2}" y1="${cy+ss*r2}" x2="${cx+c*r1}" y2="${cy+ss*r1}" ${sw1} opacity=".5"/><line x1="${cx-c*r2}" y1="${cy-ss*r2}" x2="${cx-c*r1}" y2="${cy-ss*r1}" ${sw1} opacity=".5"/>`}).join('');return mkSVG(w,h,`${circle(cx,cy,r1)}${circle(cx,cy,r2)}${sp}`);}
+function justice(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx}" y1="${h*.1}" x2="${cx}" y2="${h*.72}" ${sw12}/><line x1="${cx-w*.28}" y1="${h*.22}" x2="${cx+w*.28}" y2="${h*.22}" ${sw12}/>${circle(cx-w*.18,h*.32,w*.09)}${circle(cx+w*.18,h*.32,w*.09)}<line x1="${cx-w*.09}" y1="${h*.22}" x2="${cx-w*.18}" y2="${h*.32}" ${sw1} opacity=".5"/><line x1="${cx+w*.09}" y1="${h*.22}" x2="${cx+w*.18}" y2="${h*.32}" ${sw1} opacity=".5"/>`);}
+function hangedman(w,h){const cx=w/2;return mkSVG(w,h,`${line(cx-w*.2,h*.12,cx+w*.2,h*.12)}<line x1="${cx}" y1="${h*.12}" x2="${cx}" y2="${h*.32}" ${sw12}/>${circle(cx,h*.43,w*.13)}<line x1="${cx}" y1="${h*.56}" x2="${cx-w*.08}" y2="${h*.72}" ${sw12}/><line x1="${cx}" y1="${h*.56}" x2="${cx+w*.08}" y2="${h*.72}" ${sw12}/>`);}
+function death(w,h){const cx=w/2;return mkSVG(w,h,`${circle(cx,h*.35,w*.2)}<path d="M${cx-w*.14} ${h*.27} L${cx} ${h*.15} L${cx+w*.14} ${h*.27}" ${sw1} fill="none"/>${line(cx,h*.55,cx,h*.72)}<path d="M${cx-w*.16} ${h*.64} L${cx} ${h*.72} L${cx+w*.16} ${h*.64}" ${sw1} fill="none" opacity=".5"/>`);}
+function temperance(w,h){const cx=w/2;return mkSVG(w,h,`${circle(cx-w*.12,h*.3,w*.1)}${circle(cx+w*.12,h*.3,w*.1)}<path d="M${cx-w*.02} ${h*.28} Q${cx} ${h*.42} ${cx-w*.02} ${h*.56}" ${sw1} fill="none" opacity=".5"/><path d="M${cx+w*.02} ${h*.32} Q${cx} ${h*.18} ${cx+w*.02} ${h*.04}" ${sw1} fill="none" opacity=".5"/>${line(cx-w*.24,h*.72,cx+w*.24,h*.72,.4)}`);}
+function devil(w,h){const cx=w/2,cy=h*.36;return mkSVG(w,h,`<path d="M${cx-w*.22} ${h*.22} L${cx} ${h*.1} L${cx+w*.22} ${h*.22}" ${sw12} fill="none"/>${circle(cx,cy,w*.18)}<line x1="${cx-w*.1}" y1="${h*.54}" x2="${cx-w*.2}" y2="${h*.7}" ${sw1} opacity=".6"/><line x1="${cx+w*.1}" y1="${h*.54}" x2="${cx+w*.2}" y2="${h*.7}" ${sw1} opacity=".6"/>${dot(cx,cy,w*.05)}`);}
+function tower(w,h){const cx=w/2;return mkSVG(w,h,`${rect(cx-w*.18,h*.16,w*.36,h*.42,2)}<polygon points="${cx-w*.18},${h*.16} ${cx},${h*.05} ${cx+w*.18},${h*.16}" ${sw12} fill="none"/>${line(cx-w*.12,h*.27,cx+w*.12,h*.27,.5)}${line(cx-w*.12,h*.36,cx+w*.12,h*.36,.5)}${rect(cx-w*.08,h*.44,w*.16,h*.14,1.5)}`);}
+function star(w,h){const cx=w/2,cy=h*.4;return mkSVG(w,h,`${circle(cx,cy,w*.24)}${line(cx,h*.12,cx,h*.68)}${line(cx-w*.26,cy,cx+w*.26,cy)}${line(cx-w*.18,h*.22,cx+w*.18,h*.58)}${line(cx+w*.18,h*.22,cx-w*.18,h*.58)}${dot(cx,cy,w*.08,.15)}${dot(cx,cy,w*.05,.55)}${dot(cx,cy,w*.02)}`);}
+function moon(w,h){const cx=w/2;return mkSVG(w,h,`<path d="M${cx+w*.1} ${h*.09} A${w*.28} ${w*.28} 0 1 0 ${cx+w*.1} ${h*.69} A${w*.17} ${w*.17} 0 1 1 ${cx+w*.1} ${h*.09}Z" ${sw12} fill="none"/>${circle(cx-w*.14,h*.6,w*.06)}${circle(cx+w*.04,h*.66,w*.045)}`);}
+function sun(w,h){const cx=w/2,cy=h*.38,r=w*.2;const rays=[0,45,90,135,180,225,270,315].map(a=>`<line x1="${cx+Math.cos(a*Math.PI/180)*(r+2)}" y1="${cy+Math.sin(a*Math.PI/180)*(r+2)}" x2="${cx+Math.cos(a*Math.PI/180)*(r+8)}" y2="${cy+Math.sin(a*Math.PI/180)*(r+8)}" ${sw1} opacity=".5"/>`).join('');return mkSVG(w,h,`${circle(cx,cy,r)}${dot(cx,cy,w*.07,.2)}${rays}`);}
+function judgement(w,h){const cx=w/2;return mkSVG(w,h,`<path d="M${cx-w*.2} ${h*.12} L${cx-w*.2} ${h*.38} Q${cx-w*.2} ${h*.46} ${cx} ${h*.46} Q${cx+w*.2} ${h*.46} ${cx+w*.2} ${h*.38} L${cx+w*.2} ${h*.12} Z" ${sw12} fill="none"/>${line(cx,h*.46,cx,h*.62)}<path d="M${cx-w*.14} ${h*.66} L${cx} ${h*.74} L${cx+w*.14} ${h*.66}" ${sw1} fill="none" opacity=".5"/>`);}
+function world(w,h){const cx=w/2,cy=h*.4;return mkSVG(w,h,`${circle(cx,cy,w*.26)}<ellipse cx="${cx}" cy="${cy}" rx="${w*.13}" ry="${w*.24}" ${sw1} fill="none" opacity=".5"/>${dot(cx,cy,w*.04)}${line(cx-w*.3,cy,cx+w*.3,cy,.2)}`);}
+
+// 权杖
+function wandsAce(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx}" y1="${h*.1}" x2="${cx}" y2="${h*.72}" ${sw12}/><line x1="${cx-w*.16}" y1="${h*.26}" x2="${cx}" y2="${h*.2}" ${sw1} opacity=".6"/><line x1="${cx+w*.16}" y1="${h*.26}" x2="${cx}" y2="${h*.2}" ${sw1} opacity=".6"/><line x1="${cx-w*.14}" y1="${h*.38}" x2="${cx}" y2="${h*.32}" ${sw1} opacity=".5"/><line x1="${cx+w*.14}" y1="${h*.38}" x2="${cx}" y2="${h*.32}" ${sw1} opacity=".5"/>`);}
+function wands2(w,h){return mkSVG(w,h,`${wandsAce(w,h).replace(/<svg[^>]*>|<\/svg>/g,'')}<line x1="${w*.72}" y1="${h*.1}" x2="${w*.72}" y2="${h*.72}" stroke="${s}" stroke-width="1.2" opacity=".4"/>`);}
+function wands3(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx-w*.2}" y1="${h*.1}" x2="${cx-w*.2}" y2="${h*.72}" ${sw12}/><line x1="${cx}" y1="${h*.1}" x2="${cx}" y2="${h*.72}" ${sw12}/><line x1="${cx+w*.2}" y1="${h*.1}" x2="${cx+w*.2}" y2="${h*.72}" ${sw12} opacity=".4"/>`);}
+function wands4(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx-w*.22}" y1="${h*.1}" x2="${cx-w*.22}" y2="${h*.65}" ${sw12}/><line x1="${cx+w*.22}" y1="${h*.1}" x2="${cx+w*.22}" y2="${h*.65}" ${sw12}/>${line(cx-w*.22,h*.32,cx+w*.22,h*.32,.4)}<path d="M${cx-w*.18} ${h*.2} Q${cx} ${h*.12} ${cx+w*.18} ${h*.2}" ${sw1} fill="none" opacity=".5"/>`);}
+function wands5(w,h){const cx=w/2,cy=h*.4;return mkSVG(w,h,`<line x1="${cx-w*.18}" y1="${h*.18}" x2="${cx+w*.1}" y2="${h*.62}" ${sw12} opacity=".7"/><line x1="${cx+w*.18}" y1="${h*.18}" x2="${cx-w*.1}" y2="${h*.62}" ${sw12} opacity=".7"/><line x1="${cx}" y1="${h*.12}" x2="${cx}" y2="${h*.68}" ${sw1} opacity=".5"/>`);}
+function wands6(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx}" y1="${h*.08}" x2="${cx}" y2="${h*.7}" ${sw12}/>${starShape(cx,h*.25,w*.12,5)}<line x1="${cx-w*.2}" y1="${h*.15}" x2="${cx-w*.2}" y2="${h*.7}" ${sw1} opacity=".4"/><line x1="${cx+w*.2}" y1="${h*.15}" x2="${cx+w*.2}" y2="${h*.7}" ${sw1} opacity=".4"/>`);}
+function wands7(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx}" y1="${h*.08}" x2="${cx}" y2="${h*.7}" ${sw12}/><line x1="${cx-w*.22}" y1="${h*.2}" x2="${cx+w*.12}" y2="${h*.55}" ${sw1} opacity=".6"/><line x1="${cx+w*.22}" y1="${h*.2}" x2="${cx-w*.12}" y2="${h*.55}" ${sw1} opacity=".6"/>`);}
+function wands8(w,h){const cx=w/2;return mkSVG(w,h,[0,1,2,3,4,5,6,7].map(i=>`<line x1="${cx-w*.3+i*w*.09}" y1="${h*.15}" x2="${cx-w*.22+i*w*.09}" y2="${h*.68}" ${sw1} opacity="${.4+i*.07}"/>`).join(''));}
+function wands9(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx}" y1="${h*.06}" x2="${cx}" y2="${h*.7}" ${sw12}/>${rect(cx-w*.25,h*.2,w*.5,h*.32,2)}<line x1="${cx-w*.16}" y1="${h*.1}" x2="${cx-w*.16}" y2="${h*.65}" ${sw1} opacity=".4"/><line x1="${cx+w*.16}" y1="${h*.1}" x2="${cx+w*.16}" y2="${h*.65}" ${sw1} opacity=".4"/>`);}
+function wands10(w,h){const cx=w/2;return mkSVG(w,h,[-3,-2,-1,0,1,2,3,4,5,6].map(i=>`<line x1="${cx-w*.28+i*w*.065}" y1="${h*.12}" x2="${cx-w*.22+i*w*.065}" y2="${h*.7}" ${sw1} opacity="${.3+i*.04}"/>`).join(''));}
+function wandsPage(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx}" y1="${h*.08}" x2="${cx}" y2="${h*.65}" ${sw12}/>${starShape(cx,h*.22,w*.1,5)}<path d="M${cx-w*.08} ${h*.65} L${cx+w*.08} ${h*.65}" ${sw1}/><path d="M${cx-w*.14} ${h*.72} L${cx+w*.14} ${h*.72}" ${sw1} opacity=".5"/>`);}
+function wandsKnight(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx+w*.08}" y1="${h*.08}" x2="${cx-w*.08}" y2="${h*.65}" ${sw12}/>${circle(cx-w*.08,h*.38,w*.14)}<path d="M${cx-w*.2} ${h*.66} L${cx+w*.16} ${h*.5}" ${sw1} opacity=".5"/>`);}
+function wandsQueen(w,h){const cx=w/2;return mkSVG(w,h,`${circle(cx,h*.26,w*.16)}<line x1="${cx}" y1="${h*.08}" x2="${cx}" y2="${h*.18}" ${sw1} opacity=".6"/><line x1="${cx-w*.14}" y1="${h*.42}" x2="${cx+w*.14}" y2="${h*.42}" ${sw1} opacity=".4"/><line x1="${cx}" y1="${h*.42}" x2="${cx}" y2="${h*.68}" ${sw12}/>${dot(cx,h*.26,w*.05)}`);}
+function wandsKing(w,h){const cx=w/2;return mkSVG(w,h,`${rect(cx-w*.22,h*.38,w*.44,h*.32,3)}<path d="M${cx-w*.1} ${h*.38} L${cx-w*.18} ${h*.22} L${cx} ${h*.28} L${cx+w*.18} ${h*.22} L${cx+w*.1} ${h*.38}" ${sw12} fill="none"/><line x1="${cx}" y1="${h*.28}" x2="${cx}" y2="${h*.7}" ${sw1} opacity=".4"/>`);}
+
+// 圣杯
+function cupsAce(w,h){const cx=w/2;return mkSVG(w,h,`${rect(cx-w*.18,h*.28,w*.36,h*.36,4)}<path d="M${cx-w*.22} ${h*.64} L${cx+w*.22} ${h*.64}" ${sw12}/><path d="M${cx-w*.08} ${h*.28} L${cx} ${h*.12} L${cx+w*.08} ${h*.28}" ${sw1} fill="none" opacity=".6"/>${dot(cx,h*.46,w*.05,.3)}`);}
+function cups2(w,h){const cx=w/2;return mkSVG(w,h,`${rect(cx-w*.28,h*.28,w*.24,h*.32,3)}${rect(cx+w*.04,h*.28,w*.24,h*.32,3)}<path d="M${cx-w*.04} ${h*.35} Q${cx} ${h*.25} ${cx+w*.04} ${h*.35}" ${sw1} fill="none" opacity=".5"/>`);}
+function cups3(w,h){const cx=w/2;return mkSVG(w,h,`${circle(cx-w*.18,h*.4,w*.12)}${circle(cx,h*.28,w*.12)}${circle(cx+w*.18,h*.4,w*.12)}<path d="M${cx-w*.08} ${h*.34} Q${cx} ${h*.2} ${cx+w*.08} ${h*.34}" ${sw1} fill="none" opacity=".5"/>`);}
+function cups4(w,h){const cx=w/2;return mkSVG(w,h,`${rect(cx-w*.14,h*.14,w*.28,h*.22,3)}${rect(cx-w*.14,h*.42,w*.28,h*.22,3)}<path d="M${cx+w*.22} ${h*.28} Q${cx+w*.3} ${h*.38} ${cx+w*.22} ${h*.48}" ${sw1} fill="none" opacity=".3"/>`);}
+function cups5(w,h){const cx=w/2;return mkSVG(w,h,`${rect(cx-w*.24,h*.14,w*.2,h*.18,3)}${rect(cx-w*.24,h*.38,w*.2,h*.18,3)}<line x1="${cx-w*.04}" y1="${h*.14}" x2="${cx-w*.04}" y2="${h*.66}" ${sw12} opacity=".6"/><path d="M${cx-w*.04} ${h*.4} Q${cx+w*.16} ${h*.46} ${cx+w*.16} ${h*.6}" ${sw1} fill="none" opacity=".3"/>`);}
+function cups6(w,h){const cx=w/2;return mkSVG(w,h,[[-w*.18,h*.14],[w*.18,h*.14],[-w*.18,h*.4],[w*.18,h*.4],[-w*.18,h*.6],[w*.18,h*.6]].map(([dx,y])=>`${rect(cx+dx-w*.1,y,w*.2,h*.16,3)}`).join(''));}
+function cups7(w,h){const cx=w/2;return mkSVG(w,h,[[0,h*.12,w*.12],[- w*.2,h*.3,w*.09],[w*.2,h*.3,w*.09],[- w*.12,h*.48,w*.09],[w*.12,h*.48,w*.09],[- w*.2,h*.64,w*.08],[w*.2,h*.64,w*.08]].map(([dx,y,r])=>`${circle(cx+dx,y,r)}`).join(''));}
+function cups8(w,h){const cx=w/2;return mkSVG(w,h,[-2,-1,0,1,2].map(i=>`${rect(cx+(i-0.5)*w*.16-w*.04,h*.5,w*.14,h*.2,2)}`).join('')+`<path d="M${cx-w*.2} ${h*.3} Q${cx-w*.26} ${h*.12} ${cx} ${h*.1} Q${cx+w*.26} ${h*.12} ${cx+w*.2} ${h*.3}" ${sw1} fill="none" opacity=".4"/>`);}
+function cups9(w,h){const cx=w/2;return mkSVG(w,h,`${starShape(cx,h*.3,w*.2,5)}<path d="M${cx-w*.24} ${h*.54} L${cx+w*.24} ${h*.54}" ${sw12}/>${[-3,-1,0,1,3].map(i=>`${circle(cx+i*w*.11,h*.62,w*.07)}`).join('')}`);}
+function cups10(w,h){const cx=w/2;return mkSVG(w,h,`<path d="M${cx-w*.26} ${h*.18} Q${cx} ${h*.08} ${cx+w*.26} ${h*.18}" ${sw12} fill="none"/>`+[0,1,2,3,4].map(i=>`${dot(cx-w*.2+i*w*.1,h*.26,w*.04)}`).join('')+[0,1,2,3,4,5,6,7,8,9].map(i=>`${rect(cx+(i<5?i-2.5:i-7.5)*w*.12-w*.05,h*.42+(i>=5?h*.14:0),w*.1,h*.14,2)}`).join(''));}
+function cupsPage(w,h){const cx=w/2;return mkSVG(w,h,`${circle(cx,h*.3,w*.15)}<path d="M${cx-w*.06} ${h*.44} L${cx-w*.06} ${h*.62} Q${cx} ${h*.72} ${cx+w*.06} ${h*.62} L${cx+w*.06} ${h*.44}" ${sw12} fill="none"/>${dot(cx,h*.3,w*.05)}`);}
+function cupsKnight(w,h){const cx=w/2;return mkSVG(w,h,`${circle(cx-w*.1,h*.3,w*.14)}<path d="M${cx-w*.24} ${h*.44} L${cx+w*.2} ${h*.44}" ${sw1} opacity=".5"/><path d="M${cx+w*.1} ${h*.28} L${cx+w*.24} ${h*.2} L${cx+w*.2} ${h*.44}" ${sw12} fill="none"/>`);}
+function cupsQueen(w,h){const cx=w/2;return mkSVG(w,h,`${circle(cx,h*.24,w*.16)}<path d="M${cx-w*.2} ${h*.4} Q${cx-w*.24} ${h*.56} ${cx-w*.1} ${h*.62} L${cx+w*.1} ${h*.62} Q${cx+w*.24} ${h*.56} ${cx+w*.2} ${h*.4} Z" ${sw12} fill="none"/>${dot(cx,h*.24,w*.05)}`);}
+function cupsKing(w,h){const cx=w/2;return mkSVG(w,h,`${rect(cx-w*.22,h*.34,w*.44,h*.36,3)}<path d="M${cx-w*.1} ${h*.34} L${cx-w*.18} ${h*.18} L${cx} ${h*.26} L${cx+w*.18} ${h*.18} L${cx+w*.1} ${h*.34}" ${sw12} fill="none"/>${circle(cx,h*.52,w*.1)}`);}
+
+// 宝剑
+function swordsAce(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx}" y1="${h*.06}" x2="${cx}" y2="${h*.72}" ${sw12}/><polygon points="${cx},${h*.06} ${cx-w*.06},${h*.16} ${cx+w*.06},${h*.16}" ${sw1} fill="${s}" opacity=".2"/><line x1="${cx-w*.14}" y1="${h*.22}" x2="${cx+w*.14}" y2="${h*.22}" ${sw1} opacity=".4"/>`);}
+function swords2(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx-w*.14}" y1="${h*.08}" x2="${cx+w*.14}" y2="${h*.72}" ${sw12}/><line x1="${cx+w*.14}" y1="${h*.08}" x2="${cx-w*.14}" y2="${h*.72}" ${sw12}/>${circle(cx,h*.4,w*.12)}`);}
+function swords3(w,h){const cx=w/2;return mkSVG(w,h,`${circle(cx,h*.38,w*.2)}<line x1="${cx}" y1="${h*.14}" x2="${cx}" y2="${h*.62}" ${sw12}/><line x1="${cx-w*.14}" y1="${h*.16}" x2="${cx+w*.14}" y2="${h*.6}" ${sw1} opacity=".7"/><line x1="${cx+w*.14}" y1="${h*.16}" x2="${cx-w*.14}" y2="${h*.6}" ${sw1} opacity=".7"/>`);}
+function swords4(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx}" y1="${h*.12}" x2="${cx}" y2="${h*.68}" ${sw12} opacity=".4"/>${line(cx-w*.2,h*.22,cx+w*.2,h*.22)}<line x1="${cx-w*.16}" y1="${h*.34}" x2="${cx+w*.16}" y2="${h*.34}" ${sw1} opacity=".4"/><line x1="${cx-w*.12}" y1="${h*.46}" x2="${cx+w*.12}" y2="${h*.46}" ${sw1} opacity=".3"/>`);}
+function swords5(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx-w*.22}" y1="${h*.12}" x2="${cx-w*.22}" y2="${h*.68}" ${sw12}/><line x1="${cx}" y1="${h*.12}" x2="${cx}" y2="${h*.68}" ${sw12}/><line x1="${cx+w*.22}" y1="${h*.12}" x2="${cx+w*.22}" y2="${h*.68}" ${sw1} opacity=".4"/><line x1="${cx-w*.22}" y1="${h*.4}" x2="${cx+w*.22}" y2="${h*.4}" ${sw1} opacity=".3"/>`);}
+function swords6(w,h){const cx=w/2;return mkSVG(w,h,`<path d="M${cx-w*.22} ${h*.28} L${cx+w*.22} ${h*.52}" ${sw12}/><path d="M${cx-w*.22} ${h*.52} L${cx+w*.22} ${h*.28}" ${sw1} opacity=".4"/><line x1="${cx-w*.22}" y1="${h*.4}" x2="${cx+w*.22}" y2="${h*.4}" ${sw12}/><line x1="${cx}" y1="${h*.1}" x2="${cx}" y2="${h*.7}" ${sw1} opacity=".3"/>`);}
+function swords7(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx}" y1="${h*.08}" x2="${cx+w*.06}" y2="${h*.68}" ${sw12}/>${[-2,-1,0,1,2].map(i=>`<line x1="${cx+i*w*.1}" y1="${h*.1+i*.01}" x2="${cx+i*w*.1+w*.04}" y2="${h*.7}" ${sw1} opacity="${.3+Math.abs(i)*.15}"/>`).join('')}`);}
+function swords8(w,h){const cx=w/2;return mkSVG(w,h,`${circle(cx,h*.36,w*.18)}<line x1="${cx}" y1="${h*.14}" x2="${cx}" y2="${h*.2}" ${sw12}/><line x1="${cx}" y1="${h*.54}" x2="${cx}" y2="${h*.7}" ${sw12}/>${[-2,-1,1,2].map(i=>`<line x1="${cx+i*w*.12}" y1="${h*.22}" x2="${cx+i*w*.12}" y2="${h*.52}" ${sw1} opacity=".5"/>`).join('')}`);}
+function swords9(w,h){const cx=w/2;return mkSVG(w,h,[h*.12,h*.22,h*.32,h*.42,h*.52,h*.62].map(y=>`<line x1="${cx-w*.26}" y1="${y}" x2="${cx+w*.26}" y2="${y}" ${sw1} opacity=".5"/>`).join('')+`${circle(cx,h*.76,w*.06)}`);}
+function swords10(w,h){const cx=w/2;return mkSVG(w,h,`${circle(cx,h*.5,w*.1)}<line x1="${cx}" y1="${h*.06}" x2="${cx}" y2="${h*.4}" ${sw12}/>${[-3,-1,0,1,3].map(i=>`<line x1="${cx+i*w*.09}" y1="${h*.14}" x2="${cx+i*w*.09}" y2="${h*.42}" ${sw1} opacity="${.3+.14*Math.abs(i-.5)}" />`).join('')}<line x1="${cx-w*.24}" y1="${h*.7}" x2="${cx+w*.24}" y2="${h*.7}" ${sw1} opacity=".4"/>`);}
+function swordsPage(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx-w*.08}" y1="${h*.08}" x2="${cx+w*.08}" y2="${h*.65}" ${sw12}/><line x1="${cx+w*.18}" y1="${h*.18}" x2="${cx-w*.1}" y2="${h*.52}" ${sw1} opacity=".5"/>${circle(cx-w*.06,h*.36,w*.1)}`);}
+function swordsKnight(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx-w*.12}" y1="${h*.08}" x2="${cx+w*.12}" y2="${h*.68}" ${sw12}/><line x1="${cx+w*.2}" y1="${h*.22}" x2="${cx-w*.2}" y2="${h*.52}" ${sw12}/>${circle(cx,h*.4,w*.08)}`);}
+function swordsQueen(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx}" y1="${h*.08}" x2="${cx}" y2="${h*.68}" ${sw12}/><line x1="${cx-w*.24}" y1="${h*.28}" x2="${cx+w*.24}" y2="${h*.28}" ${sw12}/><path d="M${cx-w*.18} ${h*.22} L${cx-w*.24} ${h*.28} L${cx-w*.18} ${h*.34}" ${sw1} fill="none" opacity=".5"/>`);}
+function swordsKing(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx}" y1="${h*.06}" x2="${cx}" y2="${h*.7}" ${sw12}/>${rect(cx-w*.22,h*.28,w*.44,h*.2,2)}<path d="M${cx-w*.1} ${h*.28} L${cx-w*.2} ${h*.18} L${cx} ${h*.22} L${cx+w*.2} ${h*.18} L${cx+w*.1} ${h*.28}" ${sw1} fill="none"/>`);}
+
+// 星币
+function pentaclesAce(w,h){const cx=w/2,cy=h*.38;return mkSVG(w,h,`${starShape(cx,cy,w*.22,5)}${dot(cx,cy,w*.05,.3)}`);}
+function pentacles2(w,h){const cx=w/2;return mkSVG(w,h,`${starShape(cx,h*.24,w*.14,5)}${starShape(cx,h*.54,w*.14,5)}<path d="M${cx+w*.14} ${h*.24} Q${cx+w*.32} ${h*.4} ${cx+w*.14} ${h*.54}" ${sw1} fill="none" opacity=".4"/><path d="M${cx-w*.14} ${h*.24} Q${cx-w*.32} ${h*.4} ${cx-w*.14} ${h*.54}" ${sw1} fill="none" opacity=".4"/>`);}
+function pentacles3(w,h){const cx=w/2;return mkSVG(w,h,`${starShape(cx,h*.28,w*.16,5)}${rect(cx-w*.24,h*.48,w*.48,h*.26,3)}<line x1="${cx-w*.12}" y1="${h*.48}" x2="${cx-w*.12}" y2="${h*.74}" ${sw1} opacity=".4"/>`);}
+function pentacles4(w,h){const cx=w/2;return mkSVG(w,h,`${starShape(cx,h*.18,w*.12,5)}${starShape(cx,h*.5,w*.12,5)}${starShape(cx-w*.22,h*.34,w*.1,5)}${starShape(cx+w*.22,h*.34,w*.1,5)}<path d="M${cx-w*.12} ${h*.34} L${cx+w*.12} ${h*.34}" ${sw1} opacity=".4"/>`);}
+function pentacles5(w,h){const cx=w/2;return mkSVG(w,h,`${starShape(cx-w*.14,h*.24,w*.12,5)}${starShape(cx+w*.14,h*.24,w*.12,5)}${starShape(cx-w*.14,h*.52,w*.12,5)}${starShape(cx+w*.14,h*.52,w*.12,5)}<path d="M${cx-w*.28} ${h*.18} L${cx-w*.28} ${h*.68} Q${cx} ${h*.74} ${cx+w*.28} ${h*.68} L${cx+w*.28} ${h*.18}" ${sw1} fill="none" opacity=".3"/>`);}
+function pentacles6(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx}" y1="${h*.08}" x2="${cx}" y2="${h*.7}" ${sw12}/><line x1="${cx-w*.24}" y1="${h*.4}" x2="${cx+w*.24}" y2="${h*.4}" ${sw12}/>${starShape(cx,h*.26,w*.1,5)}${circle(cx,h*.52,w*.14)}`);}
+function pentacles7(w,h){const cx=w/2;return mkSVG(w,h,`${[-1,0,1].map(i=>`${starShape(cx+i*w*.2,h*.22,w*.09,5)}`).join('')}${[-1,0,1].map(i=>`${starShape(cx+i*w*.2,h*.44,w*.09,5)}`).join('')}${starShape(cx,h*.64,w*.09,5)}<line x1="${cx+w*.28}" y1="${h*.14}" x2="${cx+w*.28}" y2="${h*.52}" ${sw1} opacity=".5"/>`);}
+function pentacles8(w,h){const cx=w/2;return mkSVG(w,h,`<line x1="${cx-w*.14}" y1="${h*.06}" x2="${cx-w*.14}" y2="${h*.72}" ${sw12}/>${[h*.12,h*.22,h*.32,h*.42,h*.52,h*.62].map(y=>`${starShape(cx+w*.06,y,w*.1,5)}`).join('')}`);}
+function pentacles9(w,h){const cx=w/2;return mkSVG(w,h,`${[[-w*.2,h*.18],[0,h*.12],[w*.2,h*.18],[-w*.26,h*.36],[w*.26,h*.36],[-w*.2,h*.54],[0,h*.6],[w*.2,h*.54],[-w*.1,h*.38],[w*.1,h*.38]].slice(0,9).map(([dx,y])=>`${starShape(cx+dx,y,w*.08,5)}`).join('')}`);}
+function pentacles10(w,h){const cx=w/2;return mkSVG(w,h,`${[[-w*.22,h*.14],[-w*.22,h*.32],[-w*.22,h*.5],[-w*.22,h*.66],[w*.22,h*.14],[w*.22,h*.32],[w*.22,h*.5],[w*.22,h*.66],[cx-w*.22,h*.4],[cx+w*.22,h*.4]].slice(0,10).map(([x,y])=>`${starShape(x,y,w*.07,5)}`).join('')}`);}
+function pentaclesPage(w,h){const cx=w/2;return mkSVG(w,h,`${starShape(cx,h*.26,w*.18,5)}<path d="M${cx-w*.08} ${h*.44} L${cx-w*.08} ${h*.65} Q${cx} ${h*.72} ${cx+w*.08} ${h*.65} L${cx+w*.08} ${h*.44}" ${sw12} fill="none"/>`);}
+function pentaclesKnight(w,h){const cx=w/2;return mkSVG(w,h,`${starShape(cx,h*.24,w*.16,5)}<path d="M${cx-w*.2} ${h*.5} L${cx+w*.2} ${h*.5}" ${sw12}/><path d="M${cx-w*.12} ${h*.5} L${cx-w*.18} ${h*.68} M${cx+w*.12} ${h*.5} L${cx+w*.18} ${h*.68}" ${sw1} opacity=".5"/>`);}
+function pentaclesQueen(w,h){const cx=w/2;return mkSVG(w,h,`${starShape(cx,h*.34,w*.18,5)}<path d="M${cx-w*.22} ${h*.52} Q${cx-w*.26} ${h*.66} ${cx-w*.1} ${h*.7} L${cx+w*.1} ${h*.7} Q${cx+w*.26} ${h*.66} ${cx+w*.22} ${h*.52} Z" ${sw12} fill="none"/>`);}
+function pentaclesKing(w,h){const cx=w/2;return mkSVG(w,h,`${starShape(cx,h*.3,w*.18,5)}${rect(cx-w*.24,h*.5,w*.48,h*.24,3)}<path d="M${cx-w*.1} ${h*.5} L${cx-w*.2} ${h*.3} M${cx+w*.1} ${h*.5} L${cx+w*.2} ${h*.3}" ${sw1} opacity=".4"/>`);}
+
+/* ── 固定展示用的三张代表牌 ── */
+const DEMO={
+  yes:   DECK.find(c=>c.cls==='yes'),
+  no:    DECK.find(c=>c.cls==='no'),
+  maybe: DECK.find(c=>c.cls==='maybe'),
+};
+
+/* ── 位置 ── */
 const POS=[{l:49,t:21},{l:135,t:21},{l:221,t:21}];
 const STACK={l:135,t:21};
 
@@ -218,96 +363,86 @@ let step=0,busy=false,picked=null,deal=[];
 const dots=[0,1,2].map(i=>$(`d${i}`));
 function setDot(i){dots.forEach((d,j)=>d.classList.toggle('on',j===i))}
 
-/* ── S0 → S1: widget tap ── */
 $('widget').addEventListener('click',async()=>{
-  if(busy) return;
-  if(step===0) await goS1();
+  if(busy)return;
+  if(step===0)await goS1();
 });
 
 async function goS1(){
-  busy=true; step=1; setDot(1);
-
-  // Pick 3 random cards
-  const shuffled=[...CARDS].sort(()=>Math.random()-.5);
+  busy=true;step=1;setDot(1);
+  // 从78张中随机抽3张
+  const shuffled=[...DECK].sort(()=>Math.random()-.5);
   deal=shuffled.slice(0,3);
   picked=null;
 
-  // S0 exits
   $('s0l').style.transform='translateX(-30px)';$('s0l').style.opacity='0';
   await dl(70);$('s0d').style.opacity='0';
   await dl(270);$('s0').style.opacity='0';$('s0').style.pointerEvents='none';
 
-  // Reset cards to stack
   resetCards(false);
   $('s1').style.opacity='1';$('s1').style.pointerEvents='all';
   await dl(30);
 
-  // Shoot 3 cards out — stagger 70ms
-  shoot(0,POS[0]);
-  await dl(70);shoot(1,POS[1]);
-  await dl(70);shoot(2,POS[2]);
+  // 发牌
+  shoot(0,POS[0]);await dl(70);shoot(1,POS[1]);await dl(70);shoot(2,POS[2]);
 
-  // Spinners (loading)
+  // Loading
   await dl(460);
   [0,1,2].forEach(i=>$(`fs${i}`).style.opacity='1');
-  await dl(900); // API
+  await dl(900);
   [0,1,2].forEach(i=>$(`fs${i}`).style.opacity='0');
 
-  // Make pickable
+  // 可选择
   [0,1,2].forEach(i=>{
     const c=$(`fc${i}`);
     c.classList.add('pickable');
     c.onclick=()=>pickCard(i);
   });
+  await dl(100);
   $('pick-hint').style.opacity='1';
 
-  busy=false; updateCBs(1);
+  busy=false;updateCBs('s1');
 }
 
-/* ── User picks a card ── */
 async function pickCard(idx){
-  if(busy||picked!==null) return;
-  busy=true; picked=idx;
+  if(busy||picked!==null)return;
+  busy=true;picked=idx;
   $('pick-hint').style.opacity='0';
-
-  // Remove click handlers
   [0,1,2].forEach(i=>{$(`fc${i}`).onclick=null;$(`fc${i}`).classList.remove('pickable')});
 
-  // Other two fade out
+  // 另两张淡出
   [0,1,2].filter(i=>i!==idx).forEach(i=>{
     $(`fc${i}`).style.opacity='0';
-    $(`fc${i}`).style.transform='translateY(8px)';
+    $(`fc${i}`).style.transform='translateY(6px)';
   });
   await dl(350);
 
-  // Move picked card to center
+  // 移到中央
   const c=$(`fc${idx}`);
   c.style.transition='left .45s cubic-bezier(.22,1,.36,1),top .45s cubic-bezier(.22,1,.36,1)';
-  c.style.left='135px'; c.style.top='21px';
+  c.style.left='135px';c.style.top='21px';
   await dl(460);
 
-  // Flip it
+  // 翻牌
   const f=$(`ff${idx}`);
   f.innerHTML=deal[idx].art(40,64);
   await flipCard(idx);
 
-  // Transition to done state
+  // 切换完成态
   await dl(200);
   setupDone(idx);
   $('s2').style.opacity='1';$('s2').style.pointerEvents='all';
   $('s1').style.opacity='0';$('s1').style.pointerEvents='none';
 
-  // Reveal done elements
-  await dl(80);
-  $('done-label').style.opacity='1';
+  await dl(80);$('done-label').style.opacity='1';
   await dl(60);$('done-answer').style.opacity='1';
   await dl(200);$('done-tagline').style.opacity='1';
-  await dl(200);$('done-card').style.opacity='1';
-  await dl(100);$('done-card-name').style.opacity='1';
-  await dl(600);$('done-cta').style.opacity='1';
+  await dl(100);$('done-card').style.opacity='1';
+  await dl(60);$('done-card-name').style.opacity='1';
+  await dl(700);$('done-cta').style.opacity='1';
   $('done-reset').style.opacity='1';$('done-reset').style.pointerEvents='all';
 
-  step=2;setDot(2);busy=false;updateCBs(2);
+  step=2;setDot(2);busy=false;updateCBs('done-'+deal[idx].cls);
 }
 
 function setupDone(idx){
@@ -324,8 +459,7 @@ async function flipCard(i){
   c.classList.add('shimmer');
   c.style.transition='transform .2s cubic-bezier(.4,0,1,1)';
   c.style.transformOrigin='center';c.style.transform='scaleX(0)';
-  await dl(200);
-  c.classList.remove('shimmer');
+  await dl(200);c.classList.remove('shimmer');
   f.style.opacity='1';
   c.querySelectorAll('.fc-ring,.fc-dia').forEach(e=>e.style.opacity='0');
   c.style.background='var(--cb)';c.style.borderColor='var(--cbr)';
@@ -344,10 +478,9 @@ function shoot(i,pos){
 
 async function doReset(){
   if(busy)return;busy=true;
-  ['done-label','done-answer','done-tagline','done-card','done-card-name','done-cta','done-reset'].forEach(id=>{$(id).style.opacity='0'});
+  ['done-label','done-answer','done-tagline','done-card','done-card-name','done-cta','done-reset'].forEach(id=>{const e=$(id);if(e)e.style.opacity='0'});
   $('done-reset').style.pointerEvents='none';
-  await dl(220);
-  $('s2').style.opacity='0';$('s2').style.pointerEvents='none';
+  await dl(220);$('s2').style.opacity='0';$('s2').style.pointerEvents='none';
   const dcs=$('s0d').querySelectorAll('.dk-card');
   dcs.forEach(c=>{c.style.animation='none';void c.offsetHeight;c.classList.add('reform');setTimeout(()=>c.classList.remove('reform'),800)});
   $('s0d').style.opacity='1';
@@ -358,7 +491,7 @@ async function doReset(){
   $('s0l').style.transform='translateX(0)';$('s0l').style.opacity='1';
   $('s0').style.opacity='1';$('s0').style.pointerEvents='all';
   await dl(450);
-  step=0;setDot(0);busy=false;updateCBs(0);
+  step=0;setDot(0);busy=false;updateCBs('s0');
 }
 
 function resetCards(instant){
@@ -388,36 +521,55 @@ function jump(n){
   ['done-label','done-answer','done-tagline','done-card','done-card-name','done-cta'].forEach(id=>$(id).style.opacity='0');
   $('done-reset').style.cssText='position:absolute;top:9px;right:9px;width:22px;height:22px;border-radius:50%;background:rgba(160,156,176,.12);border:none;cursor:pointer;z-index:30;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--mid);opacity:0;pointer-events:none;transition:opacity .28s,background .15s';
   resetCards(true);
-  if(n===0){$('s0').style.opacity='1';$('s0').style.pointerEvents='all';step=0;setDot(0);}
+  if(n===0){$('s0').style.opacity='1';$('s0').style.pointerEvents='all';step=0;setDot(0);updateCBs('s0');}
   else if(n===1){
-    deal=[...CARDS].sort(()=>Math.random()-.5).slice(0,3);
+    deal=[...DECK].sort(()=>Math.random()-.5).slice(0,3);
     $('s1').style.opacity='1';$('s1').style.pointerEvents='all';
     void document.body.offsetHeight;
     setTimeout(()=>{
       shoot(0,POS[0]);
       setTimeout(()=>shoot(1,POS[1]),70);
-      setTimeout(()=>{shoot(2,POS[2]);
+      setTimeout(()=>{
+        shoot(2,POS[2]);
         setTimeout(()=>{
+          $('load-hint').style.opacity='0';
           [0,1,2].forEach(i=>{$(`fc${i}`).classList.add('pickable');$(`fc${i}`).onclick=()=>pickCard(i)});
           $('pick-hint').style.opacity='1';
         },500);
       },140);
     },30);
-    step=1;setDot(1);
-  } else {
-    const card=CARDS[Math.floor(Math.random()*CARDS.length)];
-    $('done-answer').textContent=card.ans;$('done-answer').className='done-answer '+card.cls;
-    $('done-tagline').textContent=card.tagline;
-    $('done-card').innerHTML=card.art(36,56);$('done-card-name').textContent=card.name;
-    $('done-card').style.opacity='1';
-    ['done-label','done-answer','done-tagline','done-card-name','done-cta'].forEach(id=>$(id).style.opacity='1');
-    $('done-reset').style.opacity='1';$('done-reset').style.pointerEvents='all';
-    $('s2').style.opacity='1';$('s2').style.pointerEvents='all';
-    step=2;setDot(2);
+    step=1;setDot(1);updateCBs('s1');
   }
-  updateCBs(n);
 }
-function updateCBs(n){document.querySelectorAll('.cb').forEach(b=>b.classList.remove('on'));$(`cb${n}`).classList.add('on')}
+
+function jumpDone(cls){
+  if(busy)return;
+  $('s0').style.opacity='0';$('s0').style.pointerEvents='none';
+  $('s1').style.opacity='0';$('s1').style.pointerEvents='none';
+  $('s0l').style.cssText='padding-left:20px;width:175px;display:flex;flex-direction:column;justify-content:center;gap:7px;cursor:pointer';
+  $('s0d').style.opacity='1';
+  resetCards(true);
+
+  const card=DEMO[cls];
+  $('done-answer').textContent=card.ans;
+  $('done-answer').className='done-answer '+card.cls;
+  $('done-tagline').textContent=card.tagline;
+  $('done-card').innerHTML=card.art(36,56);
+  $('done-card-name').textContent=card.name;
+  ['done-label','done-answer','done-tagline','done-card','done-card-name','done-cta'].forEach(id=>$(id).style.opacity='1');
+  $('done-reset').style.opacity='1';$('done-reset').style.pointerEvents='all';
+  $('s2').style.opacity='1';$('s2').style.pointerEvents='all';
+  step=2;setDot(2);updateCBs('done-'+cls);
+}
+
+function updateCBs(key){
+  document.querySelectorAll('.cb').forEach(b=>b.classList.remove('on','yes-on','no-on','maybe-on'));
+  if(key==='s0')$('cb0').classList.add('on');
+  else if(key==='s1')$('cb1').classList.add('on');
+  else if(key==='done-yes')$('cb-yes').classList.add('yes-on');
+  else if(key==='done-no')$('cb-no').classList.add('no-on');
+  else if(key==='done-maybe')$('cb-maybe').classList.add('maybe-on');
+}
 </script>
 </body>
 </html>
