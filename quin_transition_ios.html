@@ -40,6 +40,16 @@ body {
   letter-spacing: .04em;
 }
 .platform-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #1C1A2E; }
+.reset-tab {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 14px; border-radius: 20px;
+  background: rgba(0,0,0,.06);
+  font-size: 11px; font-weight: 600; color: var(--text-mid);
+  letter-spacing: .04em; margin-left: 8px;
+  border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: background .15s, color .15s;
+}
+.reset-tab:hover { background: rgba(0,0,0,.12); color: var(--text-dark); }
 
 /* ── Phone ── */
 .phone {
@@ -395,18 +405,19 @@ body {
 .d-new-btn {
   width: 100%;
   padding: 14px 20px;
-  background: linear-gradient(135deg, #1E1040 0%, #2A1F5C 100%);
-  border: none; border-radius: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
   cursor: pointer;
   display: flex; flex-direction: column; align-items: center; gap: 3px;
 }
 .d-new-btn-label {
-  font-size: 10px; color: rgba(255,255,255,.5);
+  font-size: 10px; color: var(--text-mid);
   letter-spacing: .08em; text-transform: uppercase;
 }
 .d-new-btn-main {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 16px; font-weight: 600; color: rgba(255,255,255,.92);
+  font-size: 16px; font-weight: 600; color: var(--text-dark);
   letter-spacing: .02em;
 }
 
@@ -509,6 +520,7 @@ body {
 <body>
 
 <div class="platform-badge"><div class="dot"></div>iOS · 快速决策 Widget → 详情页</div>
+<button class="reset-tab" onclick="resetToHome()">↩ 回到桌面</button>
 
 <div class="phone" id="phone">
   <div class="notch"></div>
@@ -625,7 +637,7 @@ body {
 
     <div class="d-new-divination">
       <button class="d-new-btn" onclick="openDivination()">
-        <div class="d-new-btn-label">想了解更多？</div>
+        <div class="d-new-btn-label">想深入了解这个答案？</div>
         <div class="d-new-btn-main">开始新的占卜 ✦</div>
       </button>
     </div>
@@ -765,6 +777,26 @@ function goBack() {
   detail.classList.remove('visible');
 
   app.classList.add('visible');
+}
+
+function resetToHome() {
+  const home   = document.getElementById('screen-home');
+  const detail = document.getElementById('screen-detail');
+  const app    = document.getElementById('screen-app');
+  const div    = document.getElementById('screen-divination');
+  const overlay = document.getElementById('t-overlay');
+  const rect   = document.getElementById('expand-rect');
+
+  detail.classList.remove('visible');
+  detail.style.opacity = ''; detail.style.pointerEvents = '';
+  app.classList.remove('visible');
+  div.classList.remove('visible');
+  overlay.style.opacity = '0'; overlay.classList.remove('active');
+  rect.classList.remove('expanded');
+
+  home.style.opacity = '1';
+  home.style.pointerEvents = 'all';
+  busy = false;
 }
 </script>
 </body>
