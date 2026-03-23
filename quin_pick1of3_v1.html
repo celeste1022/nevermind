@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quin · 快速决策 · 选一张 · 版本A</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F2EEE7;--wb:#FFFFFF;
+  --dk:#1C1A2E;--mid:#6B6680;--lt:#A09CB0;
+  --gold:#C09050;--cb:#FBF8F2;--cbr:#E4DDD0;
+  --yes:#3FA876;--no:#CC5858;--maybe:#7E62B8;
+  --sh:0 16px 48px rgba(28,26,46,.18),0 2px 8px rgba(28,26,46,.07);
+  --r:22px;
+}
+body{background:var(--bg);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;gap:22px;padding:48px 24px}
+.pg-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--dk);letter-spacing:.04em;text-align:center}
+.pg-sub{font-size:11px;color:var(--lt);letter-spacing:.12em;text-transform:uppercase;margin-top:4px;text-align:center}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;background:rgba(192,144,80,.1);font-size:10px;font-weight:600;color:var(--gold);letter-spacing:.05em;margin-top:6px}
+
+/* ── Widget ── */
+.widget{width:329px;height:155px;background:var(--wb);border-radius:var(--r);box-shadow:var(--sh);position:relative;overflow:hidden;user-select:none}
+.screen{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .32s ease}
+.screen.on{opacity:1;pointer-events:all}
+
+/* ══ S0: INITIAL ══ */
+#s0{display:flex;align-items:center}
+.s0l{padding-left:20px;width:175px;display:flex;flex-direction:column;justify-content:center;gap:7px;transition:transform .34s cubic-bezier(.4,0,1,1),opacity .28s ease;cursor:pointer}
+.s0-title{font-family:'Cormorant Garamond',serif;font-size:27px;font-weight:600;color:var(--dk);line-height:1}
+.s0-sub{font-size:10px;color:var(--mid);line-height:1.6;font-weight:300}
+.s0-deck{position:absolute;right:20px;top:50%;transform:translateY(-50%);width:64px;height:96px;transition:opacity .28s ease;cursor:pointer}
+.dk-card{position:absolute;width:58px;height:88px;border-radius:7px;background:linear-gradient(155deg,#22203A 0%,#16142C 100%);border:1px solid #2E2B4A;box-shadow:0 3px 12px rgba(10,8,26,.3),inset 0 1px 0 rgba(255,255,255,.06);overflow:hidden}
+.dk-card::before{content:'';position:absolute;inset:5px;border:1px solid rgba(192,144,80,.28);border-radius:4px}
+.dk-card::after{content:'';position:absolute;width:22px;height:22px;border-radius:50%;border:1px solid rgba(192,144,80,.35);top:50%;left:50%;transform:translate(-50%,-50%) translateY(-3px)}
+.dk1{transform:rotate(-5deg) translate(-2px,2px);z-index:1}
+.dk2{transform:rotate(-1deg);z-index:2}
+.dk3{transform:rotate(4deg) translate(2px,0);z-index:3}
+.dk-pulse{position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:58px;height:10px;border-radius:50%;background:radial-gradient(ellipse,rgba(192,144,80,.22) 0%,transparent 70%);animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.3;transform:translateX(-50%) scaleX(1)}50%{opacity:.8;transform:translateX(-50%) scaleX(1.25)}}
+
+/* ══ S1: 3 CARDS FACE DOWN — user picks one ══
+   Cards: 60×96, centered group
+   top=21, name top=10, kw area unused in pick phase
+   L=49 C=135 R=221 (gap=26px, side=32px)
+*/
+#s1{background:var(--wb)}
+#stage{position:absolute;inset:0}
+
+.fc{
+  position:absolute;
+  width:60px;height:96px;border-radius:8px;
+  background:linear-gradient(155deg,#22203A 0%,#16142C 100%);
+  border:1px solid #2E2B4A;
+  box-shadow:0 5px 18px rgba(10,8,26,.32),inset 0 1px 0 rgba(255,255,255,.07);
+  overflow:hidden;cursor:pointer;
+  left:135px;top:21px; /* start stacked at C */
+  transition:left .48s cubic-bezier(.22,1,.36,1),top .48s cubic-bezier(.22,1,.36,1),
+             opacity .35s ease,transform .35s ease,box-shadow .35s ease;
+}
+.fc::before{content:'';position:absolute;inset:6px;border:1px solid rgba(192,144,80,.25);border-radius:4px}
+.fc-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) translateY(-5px);width:22px;height:22px;border-radius:50%;border:1px solid rgba(192,144,80,.4)}
+.fc-dia{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) translateY(-5px) rotate(45deg);width:8px;height:8px;border:1px solid rgba(192,144,80,.52)}
+.fc-face{position:absolute;inset:0;border-radius:8px;background:var(--cb);border:1px solid var(--cbr);display:flex;align-items:center;justify-content:center;overflow:hidden;opacity:0}
+.fc-spin{position:absolute;inset:0;border-radius:8px;background:rgba(18,16,36,.72);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s ease}
+.sp{width:16px;height:16px;position:relative}
+.sp::before{content:'';position:absolute;inset:0;border-radius:50%;border:1.6px solid rgba(255,255,255,.1)}
+.sp::after{content:'';position:absolute;inset:0;border-radius:50%;border:1.6px solid transparent;border-top-color:var(--gold);border-right-color:rgba(192,144,80,.25);animation:spin .85s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Hover glow on pickable cards */
+.fc.pickable:hover{box-shadow:0 6px 24px rgba(192,144,80,.35),inset 0 1px 0 rgba(255,255,255,.1);transform:translateY(-3px)}
+.fc.pickable:active{transform:translateY(-1px)}
+
+/* Pick hint */
+#pick-hint{
+  position:absolute;bottom:12px;left:0;right:0;
+  text-align:center;font-size:10px;color:var(--mid);letter-spacing:.07em;
+  opacity:0;transition:opacity .35s ease;
+  animation:hintPulse 2.2s ease-in-out infinite;
+}
+@keyframes hintPulse{0%,100%{opacity:.45}50%{opacity:.95}}
+
+/* ══ S2: DONE ══
+   Version A: Big Yes/No answer + one-line tagline below
+*/
+#s2{}
+.done-left{
+  position:absolute;left:22px;top:0;bottom:0;width:175px;
+  display:flex;flex-direction:column;justify-content:center;gap:5px;
+}
+.done-label{font-size:9px;color:var(--lt);letter-spacing:.1em;text-transform:uppercase;opacity:0;transition:opacity .3s ease}
+.done-answer{font-family:'Cormorant Garamond',serif;font-size:56px;font-weight:600;line-height:.92;opacity:0;transition:opacity 1s cubic-bezier(.4,0,.2,1)}
+.done-answer.yes{color:var(--yes)}.done-answer.no{color:var(--no)}.done-answer.maybe{color:var(--maybe)}
+.done-tagline{font-family:'Cormorant Garamond',serif;font-size:12px;font-style:italic;color:var(--mid);line-height:1.4;opacity:0;transition:opacity .8s ease .4s}
+#done-cta{display:inline-flex;align-items:center;padding:5px 12px;border-radius:18px;font-size:9.5px;font-weight:500;border:none;cursor:pointer;color:#fff;background:var(--gold);font-family:'DM Sans',sans-serif;opacity:0;transition:opacity .5s ease;width:fit-content;margin-top:3px}
+#done-cta:active{transform:scale(.96)}
+
+.done-right{position:absolute;right:14px;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+.done-card{width:52px;height:82px;border-radius:7px;background:var(--cb);border:1px solid var(--cbr);box-shadow:0 4px 14px rgba(28,26,46,.1);display:flex;align-items:center;justify-content:center;overflow:hidden;opacity:0;transition:opacity .4s ease}
+.done-card-name{font-size:8px;color:var(--lt);text-align:center;line-height:1.3;opacity:0;transition:opacity .3s ease}
+#done-reset{position:absolute;top:9px;right:9px;width:22px;height:22px;border-radius:50%;background:rgba(160,156,176,.12);border:none;cursor:pointer;z-index:30;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--mid);opacity:0;pointer-events:none;transition:opacity .28s,background .15s}
+#done-reset:hover{background:rgba(160,156,176,.22)}
+
+/* Shimmer */
+.shimmer::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);animation:shimmer .26s ease-in-out forwards;border-radius:inherit}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(140%)}}
+
+/* Fan reform */
+@keyframes spreadIn{from{transform:rotate(var(--rv)) scale(.1) translateY(8px);opacity:0}60%{opacity:1}to{transform:rotate(var(--rv)) scale(1) translateY(0);opacity:1}}
+.dk1{--rv:-5deg}.dk2{--rv:-1deg}.dk3{--rv:4deg}
+.dk-card.reform{animation:spreadIn .5s cubic-bezier(.34,1.3,.64,1) both}
+
+/* Controls */
+.controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.cb{padding:7px 16px;border-radius:24px;border:1.5px solid #D6D0C8;background:transparent;font-size:12px;color:var(--mid);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.cb:hover:not(.on){border-color:var(--dk);color:var(--dk)}
+.cb.on{background:var(--dk);color:#fff;border-color:var(--dk)}
+.step-row{display:flex;align-items:center;gap:8px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--cbr);transition:background .3s,transform .3s}
+.dot.on{background:var(--gold);transform:scale(1.3)}
+.hint{font-size:11px;color:var(--lt);text-align:center;max-width:329px;line-height:1.7}
+.note{max-width:329px;background:rgba(192,144,80,.06);border:1px solid rgba(192,144,80,.18);border-radius:12px;padding:12px 16px;font-size:10.5px;color:var(--mid);line-height:1.7}
+.note strong{color:var(--gold);font-weight:600}
+</style>
+</head>
+<body>
+
+<div style="text-align:center">
+  <div class="pg-title">Quin · 快速决策</div>
+  <div class="pg-sub">选一张 · 版本 A — 大字答案</div>
+  <div class="badge">点一下出3张 · 用户选1张</div>
+</div>
+
+<div class="step-row">
+  <div class="dot on" id="d0"></div>
+  <div class="dot" id="d1"></div>
+  <div class="dot" id="d2"></div>
+</div>
+
+<div class="widget" id="widget">
+
+  <!-- S0 -->
+  <div class="screen on" id="s0">
+    <div class="s0l" id="s0l" onclick="goS1()">
+      <div class="s0-title">快速决策</div>
+      <div class="s0-sub">默念心中之问<br>轻触，为你展开三张</div>
+    </div>
+    <div class="s0-deck" id="s0d" onclick="goS1()">
+      <div class="dk-card dk1"></div>
+      <div class="dk-card dk2"></div>
+      <div class="dk-card dk3"></div>
+      <div class="dk-pulse"></div>
+    </div>
+  </div>
+
+  <!-- S1: 3 cards face down -->
+  <div class="screen" id="s1">
+    <div id="stage">
+      <div class="fc" id="fc0"><div class="fc-ring"></div><div class="fc-dia"></div><div class="fc-face" id="ff0"></div><div class="fc-spin" id="fs0"><div class="sp"></div></div></div>
+      <div class="fc" id="fc1"><div class="fc-ring"></div><div class="fc-dia"></div><div class="fc-face" id="ff1"></div><div class="fc-spin" id="fs1"><div class="sp"></div></div></div>
+      <div class="fc" id="fc2"><div class="fc-ring"></div><div class="fc-dia"></div><div class="fc-face" id="ff2"></div><div class="fc-spin" id="fs2"><div class="sp"></div></div></div>
+      <div id="pick-hint">选一张，感受命运的召唤</div>
+    </div>
+  </div>
+
+  <!-- S2: Done -->
+  <div class="screen" id="s2">
+    <div class="done-left">
+      <div class="done-label" id="done-label">快速决策</div>
+      <div class="done-answer" id="done-answer"></div>
+      <div class="done-tagline" id="done-tagline"></div>
+      <button id="done-cta" onclick="event.stopPropagation()">展开来看</button>
+    </div>
+    <div class="done-right">
+      <div class="done-card" id="done-card"></div>
+      <div class="done-card-name" id="done-card-name"></div>
+    </div>
+    <button id="done-reset" onclick="event.stopPropagation();doReset()">↺</button>
+  </div>
+
+</div>
+
+<div class="controls">
+  <button class="cb on" id="cb0" onclick="jump(0)">初始态</button>
+  <button class="cb"    id="cb1" onclick="jump(1)">三牌展开</button>
+  <button class="cb"    id="cb2" onclick="jump(2)">完成态</button>
+</div>
+<p class="hint">点击整个组件展开三张 · 再点其中一张选牌</p>
+<div class="note"><strong>版本 A</strong>：完成态左侧 = 大字 Yes / No / Maybe + 一句牌意短话</div>
+
+<script>
+const dl=ms=>new Promise(r=>setTimeout(r,ms));
+const $=id=>document.getElementById(id);
+
+/* ── Card data ── */
+const CARDS=[
+  {name:'星星·正位', cls:'yes',   ans:'Yes',   tagline:'希望已在途中，勇敢迈出这一步', art:starSVG},
+  {name:'塔·逆位',   cls:'no',    ans:'No',    tagline:'此刻放手，是为了更好地重来', art:towerSVG},
+  {name:'月亮·正位', cls:'maybe', ans:'Maybe', tagline:'迷雾中有答案，耐心等待清晰', art:moonSVG},
+  {name:'太阳·正位', cls:'yes',   ans:'Yes',   tagline:'光芒照耀前路，放心向前走', art:sunSVG},
+  {name:'命运之轮',  cls:'maybe', ans:'Maybe', tagline:'时机正在转动，静待最佳时刻', art:wheelSVG},
+  {name:'高塔·正位', cls:'no',    ans:'No',    tagline:'旧有结构需要打破，才能重建', art:towerSVG},
+];
+
+function starSVG(w,h){return`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><circle cx="${w/2}" cy="${h*.42}" r="${w*.28}" stroke="#C09050" stroke-width="1"/><line x1="${w/2}" y1="${h*.1}" x2="${w/2}" y2="${h*.74}" stroke="#C09050" stroke-width=".7" opacity=".3"/><line x1="${w*.1}" y1="${h*.42}" x2="${w*.9}" y2="${h*.42}" stroke="#C09050" stroke-width=".7" opacity=".3"/><circle cx="${w/2}" cy="${h*.42}" r="${w*.07}" fill="#C09050" opacity=".55"/><circle cx="${w/2}" cy="${h*.42}" r="${w*.025}" fill="#C09050"/><text x="${w/2}" y="${h*.9}" text-anchor="middle" font-size="${w*.13}" fill="#A09CB0" font-family="DM Sans">STAR</text></svg>`;}
+function towerSVG(w,h){return`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><rect x="${w*.27}" y="${h*.15}" width="${w*.46}" height="${h*.4}" rx="1.5" stroke="#C09050" stroke-width="1"/><polygon points="${w*.27},${h*.15} ${w*.5},${h*.04} ${w*.73},${h*.15}" stroke="#C09050" stroke-width="1" fill="none"/><line x1="${w*.35}" y1="${h*.27}" x2="${w*.65}" y2="${h*.27}" stroke="#C09050" stroke-width=".7" opacity=".5"/><text x="${w/2}" y="${h*.9}" text-anchor="middle" font-size="${w*.13}" fill="#A09CB0" font-family="DM Sans">TOWER</text></svg>`;}
+function moonSVG(w,h){return`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><path d="M${w*.6} ${h*.08} A${w*.3} ${w*.3} 0 1 0 ${w*.6} ${h*.68} A${w*.18} ${w*.18} 0 1 1 ${w*.6} ${h*.08}Z" stroke="#C09050" stroke-width="1" fill="none"/><text x="${w/2}" y="${h*.9}" text-anchor="middle" font-size="${w*.13}" fill="#A09CB0" font-family="DM Sans">MOON</text></svg>`;}
+function sunSVG(w,h){const cx=w/2,cy=h*.38,r=w*.18;const rays=[0,45,90,135,180,225,270,315].map(a=>`<line x1="${cx+Math.cos(a*Math.PI/180)*(r+3)}" y1="${cy+Math.sin(a*Math.PI/180)*(r+3)}" x2="${cx+Math.cos(a*Math.PI/180)*(r+8)}" y2="${cy+Math.sin(a*Math.PI/180)*(r+8)}" stroke="#C09050" stroke-width=".8" opacity=".5"/>`).join('');return`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><circle cx="${cx}" cy="${cy}" r="${r}" stroke="#C09050" stroke-width="1"/><circle cx="${cx}" cy="${cy}" r="${r*.5}" fill="#C09050" opacity=".2"/>${rays}<text x="${w/2}" y="${h*.9}" text-anchor="middle" font-size="${w*.13}" fill="#A09CB0" font-family="DM Sans">SUN</text></svg>`;}
+function wheelSVG(w,h){const cx=w/2,cy=h*.4,r1=w*.26,r2=w*.1;const sp=[0,45,90,135].map(a=>{const c=Math.cos(a*Math.PI/180),s=Math.sin(a*Math.PI/180);return`<line x1="${cx+c*r2}" y1="${cy+s*r2}" x2="${cx+c*r1}" y2="${cy+s*r1}" stroke="#C09050" stroke-width=".7" opacity=".5"/><line x1="${cx-c*r2}" y1="${cy-s*r2}" x2="${cx-c*r1}" y2="${cy-s*r1}" stroke="#C09050" stroke-width=".7" opacity=".5"/>`}).join('');return`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" fill="none"><circle cx="${cx}" cy="${cy}" r="${r1}" stroke="#C09050" stroke-width="1"/><circle cx="${cx}" cy="${cy}" r="${r2}" stroke="#C09050" stroke-width=".7"/>${sp}<text x="${w/2}" y="${h*.9}" text-anchor="middle" font-size="${w*.13}" fill="#A09CB0" font-family="DM Sans">WHEEL</text></svg>`;}
+
+/* ── Positions ── */
+const POS=[{l:49,t:21},{l:135,t:21},{l:221,t:21}];
+const STACK={l:135,t:21};
+
+let step=0,busy=false,picked=null,deal=[];
+const dots=[0,1,2].map(i=>$(`d${i}`));
+function setDot(i){dots.forEach((d,j)=>d.classList.toggle('on',j===i))}
+
+/* ── S0 → S1: widget tap ── */
+$('widget').addEventListener('click',async()=>{
+  if(busy) return;
+  if(step===0) await goS1();
+});
+
+async function goS1(){
+  busy=true; step=1; setDot(1);
+
+  // Pick 3 random cards
+  const shuffled=[...CARDS].sort(()=>Math.random()-.5);
+  deal=shuffled.slice(0,3);
+  picked=null;
+
+  // S0 exits
+  $('s0l').style.transform='translateX(-30px)';$('s0l').style.opacity='0';
+  await dl(70);$('s0d').style.opacity='0';
+  await dl(270);$('s0').style.opacity='0';$('s0').style.pointerEvents='none';
+
+  // Reset cards to stack
+  resetCards(false);
+  $('s1').style.opacity='1';$('s1').style.pointerEvents='all';
+  await dl(30);
+
+  // Shoot 3 cards out — stagger 70ms
+  shoot(0,POS[0]);
+  await dl(70);shoot(1,POS[1]);
+  await dl(70);shoot(2,POS[2]);
+
+  // Spinners (loading)
+  await dl(460);
+  [0,1,2].forEach(i=>$(`fs${i}`).style.opacity='1');
+  await dl(900); // API
+  [0,1,2].forEach(i=>$(`fs${i}`).style.opacity='0');
+
+  // Make pickable
+  [0,1,2].forEach(i=>{
+    const c=$(`fc${i}`);
+    c.classList.add('pickable');
+    c.onclick=()=>pickCard(i);
+  });
+  $('pick-hint').style.opacity='1';
+
+  busy=false; updateCBs(1);
+}
+
+/* ── User picks a card ── */
+async function pickCard(idx){
+  if(busy||picked!==null) return;
+  busy=true; picked=idx;
+  $('pick-hint').style.opacity='0';
+
+  // Remove click handlers
+  [0,1,2].forEach(i=>{$(`fc${i}`).onclick=null;$(`fc${i}`).classList.remove('pickable')});
+
+  // Other two fade out
+  [0,1,2].filter(i=>i!==idx).forEach(i=>{
+    $(`fc${i}`).style.opacity='0';
+    $(`fc${i}`).style.transform='translateY(8px)';
+  });
+  await dl(350);
+
+  // Move picked card to center
+  const c=$(`fc${idx}`);
+  c.style.transition='left .45s cubic-bezier(.22,1,.36,1),top .45s cubic-bezier(.22,1,.36,1)';
+  c.style.left='135px'; c.style.top='21px';
+  await dl(460);
+
+  // Flip it
+  const f=$(`ff${idx}`);
+  f.innerHTML=deal[idx].art(40,64);
+  await flipCard(idx);
+
+  // Transition to done state
+  await dl(200);
+  setupDone(idx);
+  $('s2').style.opacity='1';$('s2').style.pointerEvents='all';
+  $('s1').style.opacity='0';$('s1').style.pointerEvents='none';
+
+  // Reveal done elements
+  await dl(80);
+  $('done-label').style.opacity='1';
+  await dl(60);$('done-answer').style.opacity='1';
+  await dl(200);$('done-tagline').style.opacity='1';
+  await dl(200);$('done-card').style.opacity='1';
+  await dl(100);$('done-card-name').style.opacity='1';
+  await dl(600);$('done-cta').style.opacity='1';
+  $('done-reset').style.opacity='1';$('done-reset').style.pointerEvents='all';
+
+  step=2;setDot(2);busy=false;updateCBs(2);
+}
+
+function setupDone(idx){
+  const card=deal[idx];
+  $('done-answer').textContent=card.ans;
+  $('done-answer').className='done-answer '+card.cls;
+  $('done-tagline').textContent=card.tagline;
+  $('done-card').innerHTML=card.art(36,56);
+  $('done-card-name').textContent=card.name;
+}
+
+async function flipCard(i){
+  const c=$(`fc${i}`),f=$(`ff${i}`);
+  c.classList.add('shimmer');
+  c.style.transition='transform .2s cubic-bezier(.4,0,1,1)';
+  c.style.transformOrigin='center';c.style.transform='scaleX(0)';
+  await dl(200);
+  c.classList.remove('shimmer');
+  f.style.opacity='1';
+  c.querySelectorAll('.fc-ring,.fc-dia').forEach(e=>e.style.opacity='0');
+  c.style.background='var(--cb)';c.style.borderColor='var(--cbr)';
+  c.style.boxShadow='0 4px 12px rgba(28,26,46,.1)';
+  f.classList.add('shimmer');
+  c.style.transition='transform .36s cubic-bezier(0,.85,.45,1)';
+  c.style.transform='scaleX(1)';
+  await dl(240);f.classList.remove('shimmer');
+}
+
+function shoot(i,pos){
+  const e=$(`fc${i}`);
+  e.style.transition='left .48s cubic-bezier(.22,1,.36,1),top .48s cubic-bezier(.22,1,.36,1)';
+  e.style.left=pos.l+'px';e.style.top=pos.t+'px';
+}
+
+async function doReset(){
+  if(busy)return;busy=true;
+  ['done-label','done-answer','done-tagline','done-card','done-card-name','done-cta','done-reset'].forEach(id=>{$(id).style.opacity='0'});
+  $('done-reset').style.pointerEvents='none';
+  await dl(220);
+  $('s2').style.opacity='0';$('s2').style.pointerEvents='none';
+  const dcs=$('s0d').querySelectorAll('.dk-card');
+  dcs.forEach(c=>{c.style.animation='none';void c.offsetHeight;c.classList.add('reform');setTimeout(()=>c.classList.remove('reform'),800)});
+  $('s0d').style.opacity='1';
+  await dl(200);
+  $('s0l').style.opacity='0';$('s0l').style.transform='translateX(-20px)';
+  void $('s0l').offsetHeight;
+  $('s0l').style.transition='transform .4s cubic-bezier(.22,1,.36,1),opacity .4s ease';
+  $('s0l').style.transform='translateX(0)';$('s0l').style.opacity='1';
+  $('s0').style.opacity='1';$('s0').style.pointerEvents='all';
+  await dl(450);
+  step=0;setDot(0);busy=false;updateCBs(0);
+}
+
+function resetCards(instant){
+  [0,1,2].forEach(i=>{
+    const c=$(`fc${i}`);
+    if(instant)c.style.transition='none';
+    c.style.left=STACK.l+'px';c.style.top=STACK.t+'px';
+    c.style.opacity='1';c.style.transform='scaleX(1)';c.style.transformOrigin='center';
+    c.style.background='linear-gradient(155deg,#22203A 0%,#16142C 100%)';
+    c.style.borderColor='#2E2B4A';c.style.boxShadow='0 5px 18px rgba(10,8,26,.32),inset 0 1px 0 rgba(255,255,255,.07)';
+    c.querySelectorAll('.fc-ring,.fc-dia').forEach(e=>e.style.opacity='1');
+    $(`ff${i}`).style.opacity='0';$(`ff${i}`).innerHTML='';
+    $(`fs${i}`).style.opacity='0';
+    c.classList.remove('pickable');c.onclick=null;
+  });
+  $('pick-hint').style.opacity='0';
+  picked=null;
+}
+
+function jump(n){
+  if(busy)return;
+  $('s0').style.opacity='0';$('s0').style.pointerEvents='none';
+  $('s1').style.opacity='0';$('s1').style.pointerEvents='none';
+  $('s2').style.opacity='0';$('s2').style.pointerEvents='none';
+  $('s0l').style.cssText='padding-left:20px;width:175px;display:flex;flex-direction:column;justify-content:center;gap:7px;transition:transform .34s cubic-bezier(.4,0,1,1),opacity .28s ease;cursor:pointer';
+  $('s0d').style.opacity='1';
+  ['done-label','done-answer','done-tagline','done-card','done-card-name','done-cta'].forEach(id=>$(id).style.opacity='0');
+  $('done-reset').style.cssText='position:absolute;top:9px;right:9px;width:22px;height:22px;border-radius:50%;background:rgba(160,156,176,.12);border:none;cursor:pointer;z-index:30;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--mid);opacity:0;pointer-events:none;transition:opacity .28s,background .15s';
+  resetCards(true);
+  if(n===0){$('s0').style.opacity='1';$('s0').style.pointerEvents='all';step=0;setDot(0);}
+  else if(n===1){
+    deal=[...CARDS].sort(()=>Math.random()-.5).slice(0,3);
+    $('s1').style.opacity='1';$('s1').style.pointerEvents='all';
+    void document.body.offsetHeight;
+    setTimeout(()=>{
+      shoot(0,POS[0]);
+      setTimeout(()=>shoot(1,POS[1]),70);
+      setTimeout(()=>{shoot(2,POS[2]);
+        setTimeout(()=>{
+          [0,1,2].forEach(i=>{$(`fc${i}`).classList.add('pickable');$(`fc${i}`).onclick=()=>pickCard(i)});
+          $('pick-hint').style.opacity='1';
+        },500);
+      },140);
+    },30);
+    step=1;setDot(1);
+  } else {
+    const card=CARDS[Math.floor(Math.random()*CARDS.length)];
+    $('done-answer').textContent=card.ans;$('done-answer').className='done-answer '+card.cls;
+    $('done-tagline').textContent=card.tagline;
+    $('done-card').innerHTML=card.art(36,56);$('done-card-name').textContent=card.name;
+    $('done-card').style.opacity='1';
+    ['done-label','done-answer','done-tagline','done-card-name','done-cta'].forEach(id=>$(id).style.opacity='1');
+    $('done-reset').style.opacity='1';$('done-reset').style.pointerEvents='all';
+    $('s2').style.opacity='1';$('s2').style.pointerEvents='all';
+    step=2;setDot(2);
+  }
+  updateCBs(n);
+}
+function updateCBs(n){document.querySelectorAll('.cb').forEach(b=>b.classList.remove('on'));$(`cb${n}`).classList.add('on')}
+</script>
+</body>
+</html>
