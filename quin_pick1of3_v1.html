@@ -386,12 +386,14 @@ async function goS1(){
   await dl(70);$('s0d').style.opacity='0';
   await dl(270);$('s0').style.opacity='0';$('s0').style.pointerEvents='none';
 
-  resetCards(false);
+  resetCards(true);
   $('s1').style.opacity='1';$('s1').style.pointerEvents='all';
   await dl(30);
 
-  // 三张牌直接出现在位置上（系统级淡入淡出，无射出动画）
-  shoot(0,POS[0]);shoot(1,POS[1]);shoot(2,POS[2]);
+  // 三张牌直接出现在各自位置（系统淡入，无动画）
+  $(`fc0`).style.left=POS[0].l+'px';
+  $(`fc1`).style.left=POS[1].l+'px';
+  $(`fc2`).style.left=POS[2].l+'px';
   await dl(300);
 
   // 可选择
