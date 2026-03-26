@@ -172,33 +172,33 @@ const $=id=>document.getElementById(id);
 const DECK=[
   // 大阿尔克那
   {name:'愚者',      cls:'maybe', ans:'Maybe', tagline:'新旅程在脚下，带着好奇踏出去', art:fool},
-  {name:'魔术师',    cls:'yes',   ans:'Yes',   tagline:'一切已在手中，是时候行动了',   art:magician},
-  {name:'女祭司',    cls:'maybe', ans:'Maybe', tagline:'答案藏在内心，静待直觉浮现',   art:priestess},
-  {name:'皇后',      cls:'yes',   ans:'Yes',   tagline:'丰盛正在涌来，放心去接纳它',   art:empress},
-  {name:'皇帝',      cls:'yes',   ans:'Yes',   tagline:'根基已经稳固，大胆往前迈进',   art:emperor},
-  {name:'教皇',      cls:'maybe', ans:'Maybe', tagline:'循规有其智慧，看清再做决定',   art:hierophant},
-  {name:'恋人',      cls:'yes',   ans:'Yes',   tagline:'心与心已共鸣，跟随真实感受',   art:lovers},
-  {name:'战车',      cls:'maybe', ans:'Maybe', tagline:'胜利触手可及，专注才能抵达',   art:chariot},
-  {name:'力量',      cls:'yes',   ans:'Yes',   tagline:'温柔是真力量，带着它向前走',   art:strength},
-  {name:'隐士',      cls:'no',    ans:'No',    tagline:'此刻需要独处，先向内再向外',   art:hermit},
-  {name:'命运之轮',  cls:'maybe', ans:'Maybe', tagline:'轮盘正在转动，时机未到且等',   art:wheel},
-  {name:'正义',      cls:'maybe', ans:'Maybe', tagline:'天平正在衡量，公平自会揭晓',   art:justice},
-  {name:'倒吊人',    cls:'no',    ans:'No',    tagline:'换一个角度看，暂停比前进好',   art:hangedman},
-  {name:'死神',      cls:'no',    ans:'No',    tagline:'旧章节在结束，等待新的开始',   art:death},
-  {name:'节制',      cls:'maybe', ans:'Maybe', tagline:'慢慢调和才稳，耐心找到平衡',   art:temperance},
-  {name:'恶魔',      cls:'no',    ans:'No',    tagline:'束缚已久该断，先看清再行动',   art:devil},
-  {name:'塔',        cls:'no',    ans:'No',    tagline:'根基需要重建，此路暂时不通',   art:tower},
-  {name:'星星',      cls:'yes',   ans:'Yes',   tagline:'希望已在途中，勇敢迈出这步',   art:star},
-  {name:'月亮',      cls:'maybe', ans:'Maybe', tagline:'迷雾中有答案，耐心等待清晰',   art:moon},
-  {name:'太阳',      cls:'yes',   ans:'Yes',   tagline:'光芒照耀前路，放心向前走吧',   art:sun},
-  {name:'审判',      cls:'maybe', ans:'Maybe', tagline:'觉醒时刻将至，听从内心召唤',   art:judgement},
-  {name:'世界',      cls:'yes',   ans:'Yes',   tagline:'圆满已经到来，尽情去拥抱它',   art:world},
+  {name:'魔术师',    cls:'yes',   ans:'Yes',   tagline:'所需之物皆已在手，此刻便是时候',   art:magician},
+  {name:'女祭司',    cls:'maybe', ans:'Maybe', tagline:'答案不在外面，向内走就够了',   art:priestess},
+  {name:'皇后',      cls:'yes',   ans:'Yes',   tagline:'丰盛正在路上，敞开来迎接它',   art:empress},
+  {name:'皇帝',      cls:'yes',   ans:'Yes',   tagline:'根已扎深，是时候大步往前了',   art:emperor},
+  {name:'教皇',      cls:'maybe', ans:'Maybe', tagline:'旧路有时藏着它自己的智慧',   art:hierophant},
+  {name:'恋人',      cls:'yes',   ans:'Yes',   tagline:'心里早有答案了，跟着它走',   art:lovers},
+  {name:'战车',      cls:'maybe', ans:'Maybe', tagline:'终点已近，但缰绳不能松',   art:chariot},
+  {name:'力量',      cls:'yes',   ans:'Yes',   tagline:'内外都安住了，路自然会开',   art:strength},
+  {name:'隐士',      cls:'no',    ans:'No',    tagline:'往外走之前，先与自己相处一会儿',   art:hermit},
+  {name:'命运之轮',  cls:'maybe', ans:'Maybe', tagline:'轮盘仍在转，静待它落定就好',   art:wheel},
+  {name:'正义',      cls:'maybe', ans:'Maybe', tagline:'按照自己真正信的去做，就够了',   art:justice},
+  {name:'倒吊人',    cls:'no',    ans:'No',    tagline:'倒过来看，或许一切都不同了',   art:hangedman},
+  {name:'死神',      cls:'no',    ans:'No',    tagline:'这一章写完了，新的正在翻开',   art:death},
+  {name:'节制',      cls:'maybe', ans:'Maybe', tagline:'不急不躁，让它自己流向该去的地方',   art:temperance},
+  {name:'恶魔',      cls:'no',    ans:'No',    tagline:'先看清是什么在牵绊着你',   art:devil},
+  {name:'塔',        cls:'no',    ans:'No',    tagline:'倒塌是为了让更坚实的东西重建',   art:tower},
+  {name:'星星',      cls:'yes',   ans:'Yes',   tagline:'那道光一直都在，它会照到你的',   art:star},
+  {name:'月亮',      cls:'maybe', ans:'Maybe', tagline:'此刻需要感受，而不是想清楚',   art:moon},
+  {name:'太阳',      cls:'yes',   ans:'Yes',   tagline:'光已照亮前路，放心走就是了',   art:sun},
+  {name:'审判',      cls:'maybe', ans:'Maybe', tagline:'停下来回顾一遍，听听内心真正想说的',   art:judgement},
+  {name:'世界',      cls:'yes',   ans:'Yes',   tagline:'走到这里了，值得好好庆祝一番',   art:world},
   // 权杖
   {name:'权杖王牌',  cls:'yes',   ans:'Yes',   tagline:'创意之火点燃，立刻付诸行动',   art:wandsAce},
   {name:'权杖二',    cls:'maybe', ans:'Maybe', tagline:'方向尚在规划，先看清再出发',   art:wands2},
   {name:'权杖三',    cls:'yes',   ans:'Yes',   tagline:'视野已经打开，扬帆正当其时',   art:wands3},
   {name:'权杖四',    cls:'yes',   ans:'Yes',   tagline:'收获的喜悦来，庆祝这个时刻',   art:wands4},
-  {name:'权杖五',    cls:'no',    ans:'No',    tagline:'竞争让人疲惫，暂退一步再看',   art:wands5},
+  {name:'权杖五',    cls:'no',    ans:'No',    tagline:'混战中先看清自己的方向',   art:wands5},
   {name:'权杖六',    cls:'yes',   ans:'Yes',   tagline:'胜利已经在望，继续保持前进',   art:wands6},
   {name:'权杖七',    cls:'maybe', ans:'Maybe', tagline:'坚守需要代价，评估再做决定',   art:wands7},
   {name:'权杖八',    cls:'yes',   ans:'Yes',   tagline:'速度与你同行，快速推进此事',   art:wands8},
@@ -221,7 +221,7 @@ const DECK=[
   {name:'圣杯十',    cls:'yes',   ans:'Yes',   tagline:'圆满触手可及，用心去珍惜它',   art:cups10},
   {name:'圣杯侍从',  cls:'yes',   ans:'Yes',   tagline:'直觉轻声呼唤，跟随它往前走',   art:cupsPage},
   {name:'圣杯骑士',  cls:'yes',   ans:'Yes',   tagline:'浪漫与真诚并，带着心去行动',   art:cupsKnight},
-  {name:'圣杯王后',  cls:'yes',   ans:'Yes',   tagline:'温柔滋养万物，相信你的感受',   art:cupsQueen},
+  {name:'圣杯王后',  cls:'yes',   ans:'Yes',   tagline:'感受是真实的信号，相信它就好',   art:cupsQueen},
   {name:'圣杯国王',  cls:'yes',   ans:'Yes',   tagline:'情感已经成熟，智慧引领方向',   art:cupsKing},
   // 宝剑
   {name:'宝剑王牌',  cls:'yes',   ans:'Yes',   tagline:'清晰的真相来，切断疑惑前行',   art:swordsAce},
@@ -230,9 +230,9 @@ const DECK=[
   {name:'宝剑四',    cls:'no',    ans:'No',    tagline:'休息不是退缩，恢复再重新来',   art:swords4},
   {name:'宝剑五',    cls:'no',    ans:'No',    tagline:'争斗只留伤痕，退出比赢更好',   art:swords5},
   {name:'宝剑六',    cls:'maybe', ans:'Maybe', tagline:'离开是为了到，渡过才能抵岸',   art:swords6},
-  {name:'宝剑七',    cls:'no',    ans:'No',    tagline:'捷径暗藏风险，诚实才是正路',   art:swords7},
+  {name:'宝剑七',    cls:'no',    ans:'No',    tagline:'此路需要智慧，但要清楚代价在哪',   art:swords7},
   {name:'宝剑八',    cls:'no',    ans:'No',    tagline:'困住你的是念，松开思维解脱',   art:swords8},
-  {name:'宝剑九',    cls:'no',    ans:'No',    tagline:'焦虑放大了忧，先好好睡一觉',   art:swords9},
+  {name:'宝剑九',    cls:'no',    ans:'No',    tagline:'夜里放大的恐惧，等到天亮再看',   art:swords9},
   {name:'宝剑十',    cls:'no',    ans:'No',    tagline:'最低谷已到来，只有向上的路',   art:swords10},
   {name:'宝剑侍从',  cls:'maybe', ans:'Maybe', tagline:'信息尚未齐全，多观察再行动',   art:swordsPage},
   {name:'宝剑骑士',  cls:'yes',   ans:'Yes',   tagline:'速度与决断力，快速切入要点',   art:swordsKnight},
@@ -377,7 +377,7 @@ $('widget').addEventListener('click',async()=>{
 
 async function goS1(){
   busy=true;step=1;setDot(1);
-  // 从78张中随机抽3张
+  // 从78张中随机抽3张，结果提前确定
   const shuffled=[...DECK].sort(()=>Math.random()-.5);
   deal=shuffled.slice(0,3);
   picked=null;
@@ -390,14 +390,9 @@ async function goS1(){
   $('s1').style.opacity='1';$('s1').style.pointerEvents='all';
   await dl(30);
 
-  // 发牌
-  shoot(0,POS[0]);await dl(70);shoot(1,POS[1]);await dl(70);shoot(2,POS[2]);
-
-  // Loading
-  await dl(460);
-  [0,1,2].forEach(i=>$(`fs${i}`).style.opacity='1');
-  await dl(900);
-  [0,1,2].forEach(i=>$(`fs${i}`).style.opacity='0');
+  // 三张牌直接出现在位置上（系统级淡入淡出，无射出动画）
+  shoot(0,POS[0]);shoot(1,POS[1]);shoot(2,POS[2]);
+  await dl(300);
 
   // 可选择
   [0,1,2].forEach(i=>{
@@ -417,29 +412,10 @@ async function pickCard(idx){
   busy=true;picked=idx;
   $('pick-hint').style.opacity='0';
   $('pick-hint').style.animation='none';
+  [0,1,2].forEach(i=>{$(`fc${i}`).onclick=null;$(`fc${i}`).classList.remove('pickable')});
 
-  // 另两张淡出
-  [0,1,2].filter(i=>i!==idx).forEach(i=>{
-    $(`fc${i}`).style.opacity='0';
-    $(`fc${i}`).style.transform='translateY(6px)';
-  });
-  await dl(350);
-
-  // 翻牌（原地）
-  const f=$(`ff${idx}`);
-  f.innerHTML=deal[idx].art(40,64);
-  await flipCard(idx);
-
-  // 翻牌后：牌名从下方淡入，悬停 1.5 秒让用户看清
-  const flipName=$(`fcn${idx}`);
-  if(flipName){
-    flipName.textContent=deal[idx].name;
-    flipName.style.opacity='1';
-  }
-  await dl(1500);
-
-  // 切换完成态
-  await dl(200);
+  // 系统级淡入淡出：直接切换到完成态（模拟 WidgetKit 状态切换）
+  await dl(120);
   setupDone(idx);
   $('s2').style.opacity='1';$('s2').style.pointerEvents='all';
   $('s1').style.opacity='0';$('s1').style.pointerEvents='none';
