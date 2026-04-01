@@ -1,0 +1,433 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#F2F2F7;--surf:#fff;--teal:#3AAFB9;--tlt:#E8F7F8;--t1:#1C1C1E;--t2:#8E8E93;--t3:#C7C7CC;--brd:rgba(0,0,0,.08);--up:#3A7DBF;--upbg:#EBF3FC;--rv:#9B6BBF;--rvbg:#F3EBFC}
+body{font-family:-apple-system,"PingFang SC",sans-serif}
+.outer{display:flex;flex-direction:column;align-items:center;padding:24px 16px 32px;background:var(--color-background-secondary,#e8e8e8)}
+.frame{width:375px;height:720px;background:var(--bg);border-radius:44px;overflow:hidden;position:relative;border:1.5px solid rgba(0,0,0,.15);box-shadow:0 2px 12px rgba(0,0,0,.1)}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column}
+.sbar{height:44px;background:var(--surf);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0}
+.nbar{background:var(--surf);border-bottom:.5px solid var(--brd);display:flex;align-items:center;padding:0 16px;height:44px;flex-shrink:0;position:relative}
+.nbk{display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--teal);font-size:15px;background:none;border:none;padding:0}
+.nbk svg{width:10px;height:16px}
+.ntit{position:absolute;left:50%;transform:translateX(-50%);font-size:17px;font-weight:600;color:var(--t1)}
+.nact{margin-left:auto;cursor:pointer;color:var(--teal);font-size:13px;display:flex;align-items:center;gap:4px}
+.tabs{display:flex;background:var(--surf);border-bottom:.5px solid var(--brd);flex-shrink:0;padding:0 16px}
+.tab{flex:1;text-align:center;padding:11px 0 10px;font-size:13px;color:var(--t2);cursor:pointer;border-bottom:2.5px solid transparent}
+.tab.on{color:var(--teal);font-weight:500;border-bottom-color:var(--teal)}
+.scr{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.scr::-webkit-scrollbar{display:none}
+.fab{position:absolute;bottom:20px;right:16px;background:var(--teal);color:#fff;border:none;border-radius:24px;font-size:14px;font-weight:500;padding:11px 18px;cursor:pointer;box-shadow:0 4px 14px rgba(58,175,185,.38);display:flex;align-items:center;gap:6px;z-index:10}
+.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px}
+.tc{border-radius:10px;overflow:hidden;cursor:pointer;background:var(--surf);border:.5px solid var(--brd);transition:transform .13s}
+.tc:active{transform:scale(.95)}
+.tc.grey .cf{filter:grayscale(100%) brightness(.85)}
+.cf{width:100%;aspect-ratio:.62;position:relative;overflow:hidden}
+.bnew{position:absolute;top:4px;right:4px;background:#FF3B30;color:#fff;font-size:9px;font-weight:600;padding:2px 5px;border-radius:4px;line-height:1.3}
+.bcnt{position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,.62);color:#fff;font-size:10px;font-weight:500;padding:2px 6px;border-radius:20px}
+.tname{font-size:11px;color:var(--t1);text-align:center;padding:5px 4px 6px}
+.tc.grey .tname{color:var(--t3)}
+.shdr{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 10px}
+.stit{font-size:17px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:8px}
+.sico{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.ssee{font-size:13px;color:var(--teal);display:flex;align-items:center;gap:2px;cursor:pointer}
+.srow{overflow-x:auto;overflow-y:hidden;padding:0 16px 12px;display:flex;gap:10px;scrollbar-width:none}
+.srow::-webkit-scrollbar{display:none}
+.sc{flex-shrink:0;width:86px;border-radius:10px;overflow:hidden;background:var(--surf);border:.5px solid var(--brd);cursor:pointer;transition:transform .13s}
+.sc:active{transform:scale(.95)}
+.sc.grey .scf{filter:grayscale(100%) brightness(.85)}
+.scf{width:100%;aspect-ratio:.62;position:relative;overflow:hidden}
+.scname{font-size:10.5px;color:var(--t1);text-align:center;padding:4px 3px 6px;line-height:1.3}
+.sc.grey .scname{color:var(--t3)}
+.sdiv{height:.5px;background:var(--brd);margin:0 16px}
+.smask{position:absolute;inset:0;background:rgba(0,0,0,0);pointer-events:none;transition:background .3s;z-index:20}
+.smask.show{background:rgba(0,0,0,.42);pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surf);border-radius:24px 24px 0 0;transform:translateY(100%);transition:transform .36s cubic-bezier(.32,.72,0,1);z-index:21;display:flex;flex-direction:column;height:93%}
+.sheet.open{transform:translateY(0)}
+.shandle{width:36px;height:4px;background:var(--t3);border-radius:2px;margin:10px auto 4px;flex-shrink:0;cursor:pointer}
+.sscr{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1}
+.sscr::-webkit-scrollbar{display:none}
+.car{position:relative;height:256px;overflow:hidden;flex-shrink:0;background:linear-gradient(180deg,#F7F5FF 0%,#EEF6F8 100%)}
+.car::before,.car::after{content:'';position:absolute;top:0;height:100%;width:68px;z-index:5;pointer-events:none}
+.car::before{left:0;background:linear-gradient(to right,rgba(247,245,255,1) 20%,transparent)}
+.car::after{right:0;background:linear-gradient(to left,rgba(238,246,248,1) 20%,transparent)}
+.cp{position:absolute;top:50%;transform:translateY(-50%);left:-50px;width:90px;height:152px;border-radius:10px;overflow:hidden;opacity:.4;cursor:pointer;z-index:2;box-shadow:4px 0 16px rgba(0,0,0,.1)}
+.cn{position:absolute;top:50%;transform:translateY(-50%);right:-50px;width:90px;height:152px;border-radius:10px;overflow:hidden;opacity:.4;cursor:pointer;z-index:2;box-shadow:-4px 0 16px rgba(0,0,0,.1)}
+.cm{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:134px;height:216px;border-radius:14px;overflow:hidden;z-index:3;box-shadow:0 10px 32px rgba(0,0,0,.18);cursor:pointer;transition:transform .15s}
+.cm:hover{transform:translate(-50%,-50%) scale(1.02)}
+.cm:active{transform:translate(-50%,-50%) scale(.97)}
+.zbtn{position:absolute;top:9px;right:9px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.3);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:4}
+.zbtn svg{width:13px;height:13px}
+.carht{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--t3);z-index:6;white-space:nowrap;pointer-events:none}
+.hi{text-align:center;padding:16px 16px 2px}
+.hn{font-size:20px;font-weight:600;color:var(--t1)}
+.hs{font-size:13px;color:var(--t2);margin-top:3px}
+.kwr{display:flex;flex-wrap:wrap;gap:7px;padding:10px 16px 4px}
+.kw{background:var(--tlt);color:var(--teal);font-size:12px;font-weight:500;padding:5px 11px;border-radius:20px}
+.sec{padding:14px 16px 0}
+.sech{font-size:15px;font-weight:600;color:var(--t1);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.secdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.mbox{border-radius:12px;padding:14px;margin-bottom:10px}
+.mlab{font-size:12px;font-weight:600;margin-bottom:6px}
+.mtxt{font-size:13px;line-height:1.65;color:var(--t1)}
+.apill{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:500;padding:5px 10px;border-radius:8px;margin-top:8px}
+.xrow{display:flex;gap:12px;overflow-x:auto;padding:0 16px 16px;scrollbar-width:none}
+.xrow::-webkit-scrollbar{display:none}
+.xi{flex-shrink:0;width:86px;display:flex;flex-direction:column;align-items:center;gap:5px}
+.xc{width:86px;aspect-ratio:.62;border-radius:10px;overflow:hidden;border:.5px solid rgba(0,0,0,.1)}
+.xl{font-size:10px;color:var(--t2);text-align:center;line-height:1.4}
+.sts{display:flex;gap:10px;padding:0 16px 24px}
+.sb{flex:1;background:var(--bg);border-radius:12px;padding:14px 12px}
+.sn{font-size:24px;font-weight:600;color:var(--t1)}
+.sl{font-size:11px;color:var(--t2);line-height:1.4;margin-top:4px}
+.fsov{position:absolute;inset:0;z-index:30;opacity:0;pointer-events:none;transition:opacity .3s;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+.fsov.show{opacity:1;pointer-events:auto}
+.fsbg{position:absolute;inset:0;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.65}
+.b1{width:240px;height:240px;top:-50px;left:-50px;animation:ba1 6s ease-in-out infinite}
+.b2{width:200px;height:200px;bottom:-40px;right:-40px;animation:ba2 7.5s ease-in-out infinite}
+.b3{width:180px;height:180px;top:30%;left:20%;animation:ba3 5s ease-in-out infinite}
+@keyframes ba1{0%,100%{transform:translate(0,0)}50%{transform:translate(50px,40px)}}
+@keyframes ba2{0%,100%{transform:translate(0,0)}50%{transform:translate(-45px,-35px)}}
+@keyframes ba3{0%,100%{transform:translate(0,0)}33%{transform:translate(40px,-30px)}66%{transform:translate(-30px,35px)}}
+.fscls{position:absolute;top:56px;right:18px;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:6}
+.fscls svg{width:14px;height:14px}
+.fsnav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.28);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:6;color:white;font-size:22px}
+.fsprev{left:8px}
+.fsnext{right:8px}
+.scene{width:158px;height:254px;perspective:750px;z-index:4}
+.card3d{width:100%;height:100%;position:relative;transform-style:preserve-3d;will-change:transform;transition:transform .55s cubic-bezier(.4,.2,.2,1)}
+.cff,.cbk{position:absolute;inset:0;border-radius:14px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.cbk{transform:rotateY(180deg)}
+.foil{position:absolute;inset:0;border-radius:14px;pointer-events:none;opacity:0;mix-blend-mode:color-dodge}
+.shine{position:absolute;inset:0;border-radius:14px;pointer-events:none;opacity:0}
+.fsname{color:rgba(255,255,255,.95);font-size:18px;font-weight:600;margin-top:18px;z-index:4;text-shadow:0 2px 10px rgba(0,0,0,.35)}
+.fssub{color:rgba(255,255,255,.62);font-size:12.5px;margin-top:4px;z-index:4}
+.fsbtns{display:flex;gap:9px;margin-top:20px;z-index:4}
+.fsbtn{background:rgba(255,255,255,.18);color:rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.28);border-radius:22px;padding:9px 15px;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:5px}
+.fsht{font-size:10.5px;color:rgba(255,255,255,.38);margin-top:10px;z-index:4;text-align:center;line-height:1.7}
+</style>
+
+<div class="outer"><div class="frame">
+  <div class="screen">
+    <div class="sbar"><span style="font-size:15px;font-weight:600;color:var(--t1)">9:41</span><span style="font-size:13px;color:var(--t1)">▶▶ WiFi 🔋</span></div>
+    <div class="nbar">
+      <button class="nbk"><svg viewBox="0 0 10 16" fill="none"><path d="M8.5 1.5L1.5 8l7 6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>我的塔罗牌</span></button>
+      <span class="ntit">预言塔罗</span>
+      <div class="nact"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="4" height="4" rx="1" stroke="#3AAFB9" stroke-width="1.3"/><rect x="7" y="1" width="4" height="4" rx="1" stroke="#3AAFB9" stroke-width="1.3"/><rect x="1" y="7" width="4" height="4" rx="1" stroke="#3AAFB9" stroke-width="1.3"/><rect x="7" y="7" width="4" height="4" rx="1" stroke="#3AAFB9" stroke-width="1.3"/></svg>切换</div>
+    </div>
+    <div class="tabs">
+      <div class="tab" onclick="swTab(0,this)">所有塔罗牌</div>
+      <div class="tab" onclick="swTab(1,this)">大阿卡纳</div>
+      <div class="tab on" onclick="swTab(2,this)">小阿卡纳</div>
+    </div>
+    <div class="scr" id="mscr"></div>
+    <button class="fab"><svg viewBox="0 0 15 15" fill="none"><path d="M3 12Q7.5 8 12 3M3 3Q7.5 7 12 12" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>把玩</button>
+  </div>
+
+  <div class="smask" id="smask" onclick="closeSheet()"></div>
+  <div class="sheet" id="sheet">
+    <div class="shandle" onclick="closeSheet()"></div>
+    <div class="sscr" id="sscr">
+      <div class="car">
+        <div class="cp" id="cp" onclick="heroNav(-1)"><div id="cp-in" style="width:100%;height:100%"></div></div>
+        <div class="cm" id="cm" onclick="openFull()">
+          <div id="cm-in" style="width:100%;height:100%"></div>
+          <button class="zbtn" onclick="event.stopPropagation();openFull()"><svg viewBox="0 0 13 13" fill="none"><path d="M1 4.5V1h3.5M8.5 1H12v3.5M12 8.5V12H8.5M4.5 12H1V8.5" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+        </div>
+        <div class="cn" id="cn" onclick="heroNav(1)"><div id="cn-in" style="width:100%;height:100%"></div></div>
+        <div class="carht">← 左右滑动切换 →</div>
+      </div>
+      <div id="shi"></div>
+    </div>
+  </div>
+
+  <div class="fsov" id="fsov">
+    <div class="fsbg"><div class="blob b1" id="b1"></div><div class="blob b2" id="b2"></div><div class="blob b3" id="b3"></div></div>
+    <button class="fscls" onclick="closeFull()"><svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    <button class="fsnav fsprev" onclick="fsNav(-1)">‹</button>
+    <button class="fsnav fsnext" onclick="fsNav(1)">›</button>
+    <div class="scene" id="scene">
+      <div class="card3d" id="card3d">
+        <div class="cff"><div id="fsf" style="width:100%;height:100%"></div><div class="foil" id="foil"></div><div class="shine" id="shine"></div></div>
+        <div class="cbk"><div id="fsb" style="width:100%;height:100%"></div></div>
+      </div>
+    </div>
+    <div class="fsname" id="fsname"></div>
+    <div class="fssub" id="fssub"></div>
+    <div class="fsbtns">
+      <button class="fsbtn" onclick="closeFull()"><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 9V2M2 5.5l3.5 3.5 3.5-3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>收起</button>
+      <button class="fsbtn" onclick="flipCard()"><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5h7M7 2.5l2.5 3L7 8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>翻面</button>
+      <button class="fsbtn" onclick="closeFull()"><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 2v7M2 5.5l3.5-3.5 3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>详情</button>
+    </div>
+    <div class="fsht">鼠标移动 → 全息光效倾斜<br>拖动卡牌 → 翻面 · ‹ › → 切换</div>
+  </div>
+</div></div>
+
+<script>
+const MAJ=["愚人","魔术师","女祭司","女皇","皇帝","教皇","恋人","战车","力量","隐者","命运之轮","正义","倒吊人","死神","节制","恶魔","塔","星星","月亮","太阳","审判","世界"];
+const SUITS=[
+  {key:'w',name:'权杖',bg:'#FFF4E6',sk:'#E8843A',f1:'#F5C080',f2:'#E07020',ft:'#B85010',c1:'#F5A050',c2:'#B84010',c3:'#7A2008'},
+  {key:'c',name:'圣杯',bg:'#E8F4FB',sk:'#4A90C4',f1:'#90C8E8',f2:'#2070A8',ft:'#1050A0',c1:'#4090D0',c2:'#105090',c3:'#082850'},
+  {key:'s',name:'宝剑',bg:'#F0F0F8',sk:'#7878C0',f1:'#A8A8D8',f2:'#5050A0',ft:'#303080',c1:'#7070C0',c2:'#303090',c3:'#181840'},
+  {key:'p',name:'星币',bg:'#F8F6E0',sk:'#B09820',f1:'#D4C060',f2:'#907010',ft:'#705010',c1:'#C0A020',c2:'#806010',c3:'#403008'}
+];
+const MAJSTY={bg:'#F3F0FF',sk:'#7B5CB8',f1:'#C4A8E0',f2:'#8050B0',ft:'#5030A0',c1:'#9060C8',c2:'#502090',c3:'#280850'};
+const RNKS=["A","二","三","四","五","六","七","八","九","十","侍从","骑士","皇后","国王"];
+const DNAMES=["维特塔罗","预言塔罗","版画塔罗","奥义塔罗"];
+const DC=[
+  {bg:'#FDF6E3',f1:'#E8D5A3',f2:'#C4A96B',f3:'#F5C842',ft:'#B08010'},
+  {bg:'#F0EBF8',f1:'#D4C0E8',f2:'#9B76C8',f3:'#C4A0E0',ft:'#6030A0'},
+  {bg:'#FDE8E0',f1:'#F0C4B0',f2:'#E08060',f3:'#E87050',ft:'#C04020'},
+  {bg:'#E8EFF8',f1:'#B8CCE8',f2:'#6090C0',f3:'#4A78B0',ft:'#204080'}
+];
+
+// ─── FIX: store lists by key, pass string key in onclick ───────────────────
+const LISTS = { all: [...MAJ] };
+SUITS.forEach(s => {
+  const cards = RNKS.map(r => r + s.name);
+  LISTS[s.key] = cards;
+  cards.forEach(c => LISTS.all.push(c));
+});
+LISTS.major = [...MAJ];
+// ────────────────────────────────────────────────────────────────────────────
+
+const KWS={"愚人":["新的开始","冒险精神","自由","纯真","信念"],"魔术师":["意志力","技能","专注","实现","资源"]};
+const UM={"愚人":"象征全新的开始与无限的可能性。你站在悬崖边缘，却充满信心地迈出第一步，代表着对未知的勇敢探索与无拘无束的自由心灵。","default":"这张牌在正位时代表积极的能量流动，鼓励你顺势而为，相信自己内在的力量与直觉，在当下的处境中寻找成长的契机。"};
+const RM={"愚人":"可能暗示鲁莽行事或逃避责任，缺乏计划的冲动可能带来不必要的风险。提醒你在迈步之前，先看清脚下的路。","default":"逆位时提示你审视内在的阻力。某些旧有模式或恐惧正阻碍前进，是时候温柔地放下那份执念，重新校准方向。"};
+const UA={"愚人":"迈出那一步，不要等到万事俱备。","default":"顺应当下变化，行动比等待更有力量。"};
+const RA={"愚人":"先暂停，审视动机与真实方向。","default":"关注内心阻力根源，有意识地松开执念。"};
+
+let cData={},cList=[],cIdx=0,flipped=false,rafId=null;
+let tx=0,ty=0,ttx=0,tty=0,fp=0,shimmer=0,msx=0;
+
+function initData(){
+  LISTS.all.forEach(n=>{
+    const d=Math.random()>.28;
+    cData[n]={drawn:d,count:d?Math.floor(Math.random()*12)+1:0,isNew:d&&Math.random()>.72,total:d?Math.floor(Math.random()*30)+2:0};
+  });
+}
+
+function getSuit(n){return SUITS.find(s=>n.endsWith(s.name));}
+function getSty(n){return getSuit(n)||MAJSTY;}
+
+function mkSvg(n,s){
+  return `<svg width="100%" height="100%" viewBox="0 0 74 120" xmlns="http://www.w3.org/2000/svg">
+    <rect width="74" height="120" rx="5" fill="${s.bg}"/>
+    <rect x="4" y="4" width="66" height="112" rx="3" fill="${s.sk}" opacity="0.12"/>
+    <circle cx="37" cy="52" r="24" fill="${s.f1}" opacity="0.38"/>
+    <circle cx="37" cy="52" r="14" fill="${s.f2}" opacity="0.55"/>
+    <text x="37" y="57" text-anchor="middle" font-size="13" font-family="-apple-system,PingFang SC,sans-serif" fill="${s.ft}" font-weight="600">${n.slice(0,1)}</text>
+    <text x="37" y="105" text-anchor="middle" font-size="7.5" font-family="-apple-system,PingFang SC,sans-serif" fill="${s.sk}" opacity="0.7">${s.name||''}</text>
+  </svg>`;
+}
+function mkBack(s){
+  return `<svg width="100%" height="100%" viewBox="0 0 74 120" xmlns="http://www.w3.org/2000/svg">
+    <rect width="74" height="120" rx="5" fill="${s.bg}"/>
+    <rect x="5" y="5" width="64" height="110" rx="3" fill="none" stroke="${s.sk}" stroke-width="1.5"/>
+    <rect x="10" y="10" width="54" height="100" rx="2" fill="none" stroke="${s.sk}" stroke-width="0.7" opacity="0.5"/>
+    <circle cx="37" cy="60" r="26" fill="none" stroke="${s.f2}" stroke-width="1" opacity="0.4"/>
+    <circle cx="37" cy="60" r="18" fill="none" stroke="${s.f2}" stroke-width="0.8" opacity="0.35"/>
+    <path d="M37 34L37 86 M11 60L63 60 M19 42L55 78 M55 42L19 78" stroke="${s.f2}" stroke-width="0.7" opacity="0.28"/>
+    <circle cx="37" cy="60" r="8" fill="${s.f1}" opacity="0.5"/>
+    <text x="37" y="115" text-anchor="middle" font-size="6" font-family="-apple-system,PingFang SC,sans-serif" fill="${s.sk}" opacity="0.5">TAROT</text>
+  </svg>`;
+}
+function mkDkSvg(n,dc){
+  return `<svg width="100%" height="100%" viewBox="0 0 74 120" xmlns="http://www.w3.org/2000/svg">
+    <rect width="74" height="120" rx="5" fill="${dc.bg}"/>
+    <rect x="4" y="4" width="66" height="112" rx="3" fill="${dc.f2}" opacity="0.1"/>
+    <circle cx="37" cy="52" r="22" fill="${dc.f1}" opacity="0.4"/>
+    <circle cx="37" cy="52" r="13" fill="${dc.f3}" opacity="0.5"/>
+    <text x="37" y="57" text-anchor="middle" font-size="12" font-family="-apple-system,PingFang SC,sans-serif" fill="${dc.ft}" font-weight="600">${n.slice(0,1)}</text>
+  </svg>`;
+}
+
+// ─── FIX: onclick uses string listKey, no JSON in HTML attribute ───────────
+function cardEl(n, listKey, cc, fc, nc) {
+  const d=cData[n]||{}, s=getSty(n);
+  return `<div class="${cc}${d.drawn?'':' grey'}" onclick="openCard('${n}','${listKey}')">
+    <div class="${fc}">${mkSvg(n,s)}${d.isNew?'<div class="bnew">NEW</div>':''}${d.drawn&&d.count>0?`<div class="bcnt">${d.count}</div>`:''}</div>
+    <div class="${nc}">${n}</div></div>`;
+}
+// ────────────────────────────────────────────────────────────────────────────
+
+const SICO={
+  w:`<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M3.5 4l3-3 3 3M3.5 9l3 3 3-3" stroke="#E07020" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+  c:`<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2.5 2.5h8v5a4 4 0 01-8 0V2.5z" stroke="#2070A8" stroke-width="1.3"/><path d="M4.5 12h4M6.5 10v2" stroke="#2070A8" stroke-width="1.3" stroke-linecap="round"/></svg>`,
+  s:`<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v9M3.5 4l3-3 3 3" stroke="#5050A0" stroke-width="1.4" stroke-linecap="round"/><path d="M4.5 10h4" stroke="#5050A0" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+  p:`<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="#907010" stroke-width="1.3"/><circle cx="6.5" cy="6.5" r="2.5" stroke="#907010" stroke-width="1"/></svg>`
+};
+
+function renderMinor(){
+  return SUITS.map((s,i)=>`
+    <div>
+      <div class="shdr"><div class="stit"><div class="sico" style="background:${s.bg}">${SICO[s.key]}</div>${s.name}</div>
+        <div class="ssee">查看全部 <svg width="6" height="10" viewBox="0 0 6 10" fill="none"><path d="M1 1l4 4-4 4" stroke="#3AAFB9" stroke-width="1.4" stroke-linecap="round"/></svg></div></div>
+      <div class="srow">${RNKS.map(r=>cardEl(r+s.name, s.key, 'sc','scf','scname')).join('')}</div>
+      ${i<3?'<div class="sdiv"></div>':''}
+    </div>`).join('')+'<div style="height:70px"></div>';
+}
+function renderAll(){
+  return `<div class="cgrid">${LISTS.all.map(n=>cardEl(n,'all','tc','cf','tname')).join('')}</div><div style="height:70px"></div>`;
+}
+function renderMaj(){
+  return `<div class="cgrid">${MAJ.map(n=>cardEl(n,'major','tc','cf','tname')).join('')}</div><div style="height:70px"></div>`;
+}
+
+function swTab(i,el){
+  document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('on',j===i));
+  const s=document.getElementById('mscr');
+  s.innerHTML=[renderAll,renderMaj,renderMinor][i]();s.scrollTop=0;
+}
+
+function openCard(name, listKey){
+  cList = LISTS[listKey] || LISTS.all;
+  cIdx = cList.indexOf(name);
+  if(cIdx<0) cIdx=0;
+  flipped=false;
+  renderCarousel(); renderInfo();
+  document.getElementById('smask').classList.add('show');
+  setTimeout(()=>document.getElementById('sheet').classList.add('open'),10);
+  document.getElementById('sscr').scrollTop=0;
+}
+
+function renderCarousel(){
+  const n=cList[cIdx],pn=cList[cIdx-1],nn=cList[cIdx+1];
+  document.getElementById('cm-in').innerHTML=mkSvg(n,getSty(n));
+  document.getElementById('cp-in').innerHTML=pn?mkSvg(pn,getSty(pn)):'';
+  document.getElementById('cn-in').innerHTML=nn?mkSvg(nn,getSty(nn)):'';
+  document.getElementById('cp').style.cssText=`opacity:${pn?.4:0};pointer-events:${pn?'auto':'none'}`;
+  document.getElementById('cn').style.cssText=`opacity:${nn?.4:0};pointer-events:${nn?'auto':'none'}`;
+}
+
+function heroNav(dir){
+  const ni=cIdx+dir;
+  if(ni<0||ni>=cList.length)return;
+  cIdx=ni; flipped=false;
+  renderCarousel(); renderInfo();
+  document.getElementById('sscr').scrollTop=0;
+  if(document.getElementById('fsov').classList.contains('show')) updateFsCard();
+}
+
+function renderInfo(){
+  const n=cList[cIdx],d=cData[n]||{},suit=getSuit(n);
+  const isMaj=MAJ.includes(n);
+  const kws=KWS[n]||["直觉","转化","内省","选择","力量"];
+  document.getElementById('shi').innerHTML=`
+    <div class="hi"><div class="hn">${n}</div><div class="hs">${isMaj?'大阿卡纳':`小阿卡纳 · ${suit?suit.name:''}`}</div></div>
+    <div class="kwr">${kws.map(k=>`<span class="kw">${k}</span>`).join('')}</div>
+    <div class="sec"><div class="sech"><span class="secdot" style="background:#3A7DBF"></span>正位含义</div>
+    <div class="mbox" style="background:var(--upbg)">
+      <div class="mlab" style="color:var(--up)">正位</div>
+      <div class="mtxt">${UM[n]||UM.default}</div>
+      <div class="apill" style="background:rgba(58,125,191,.12);color:var(--up)">行动建议：${UA[n]||UA.default}</div>
+    </div></div>
+    <div class="sec"><div class="sech"><span class="secdot" style="background:#9B6BBF"></span>逆位含义</div>
+    <div class="mbox" style="background:var(--rvbg)">
+      <div class="mlab" style="color:var(--rv)">逆位</div>
+      <div class="mtxt">${RM[n]||RM.default}</div>
+      <div class="apill" style="background:rgba(155,107,191,.12);color:var(--rv)">行动建议：${RA[n]||RA.default}</div>
+    </div></div>
+    <div class="sec"><div class="sech"><span class="secdot" style="background:var(--teal)"></span>同一张牌在不同塔罗中</div></div>
+    <div class="xrow">${DC.map((dc,i)=>`<div class="xi"><div class="xc">${mkDkSvg(n,dc)}</div><div class="xl">${DNAMES[i]}</div></div>`).join('')}</div>
+    <div class="sec" style="margin-bottom:12px"><div class="sech"><span class="secdot" style="background:#FF9500"></span>你与这张牌的关系</div></div>
+    <div class="sts">
+      <div class="sb"><div style="font-size:18px;margin-bottom:4px">🃏</div><div class="sn">${d.count||0}</div><div class="sl">本套牌中<br>抽到次数</div></div>
+      <div class="sb"><div style="font-size:18px;margin-bottom:4px">✨</div><div class="sn">${d.total||0}</div><div class="sl">所有牌组中<br>累计抽到</div></div>
+    </div><div style="height:20px"></div>`;
+}
+
+function closeSheet(){
+  document.getElementById('sheet').classList.remove('open');
+  document.getElementById('smask').classList.remove('show');
+  closeFull();
+}
+
+function updateFsCard(){
+  const n=cList[cIdx],s=getSty(n);
+  document.getElementById('fsf').innerHTML=mkSvg(n,s);
+  document.getElementById('fsb').innerHTML=mkBack(s);
+  document.getElementById('fsname').textContent=n;
+  document.getElementById('fssub').textContent=MAJ.includes(n)?'大阿卡纳':`小阿卡纳 · ${s.name||''}`;
+  document.getElementById('b1').style.background=s.c1;
+  document.getElementById('b2').style.background=s.c2;
+  document.getElementById('b3').style.background=s.c3;
+  flipped=false;
+  document.getElementById('card3d').style.transform='';
+}
+
+function openFull(){
+  updateFsCard();
+  document.getElementById('fsov').classList.add('show');
+  startRaf();
+}
+function closeFull(){
+  document.getElementById('fsov').classList.remove('show');
+  stopRaf();
+}
+function fsNav(dir){ heroNav(dir); }
+function flipCard(){
+  flipped=!flipped;
+  const c=document.getElementById('card3d');
+  c.style.transition='transform .55s cubic-bezier(.4,.2,.2,1)';
+  c.style.transform=`perspective(750px) translateY(${Math.sin(fp)*8}px) rotateX(${ty*14}deg) rotateY(${flipped?180+tx*14:tx*14}deg)`;
+  setTimeout(()=>{ c.style.transition='none'; },600);
+}
+
+function startRaf(){
+  if(rafId)return;
+  function frame(){
+    tx+=(ttx-tx)*.08; ty+=(tty-ty)*.08;
+    fp+=0.02; shimmer+=0.025;
+    const fy=Math.sin(fp)*8;
+    const c=document.getElementById('card3d');
+    if(c){
+      c.style.transition='none';
+      c.style.transform=`perspective(750px) translateY(${fy}px) rotateX(${ty*14}deg) rotateY(${(flipped?180:0)+tx*14}deg)`;
+    }
+    const mag=Math.abs(tx)+Math.abs(ty);
+    const foil=document.getElementById('foil');
+    const shn=document.getElementById('shine');
+    if(foil){
+      const auto=Math.sin(shimmer)*.5+.5;
+      foil.style.opacity=Math.min(mag*.6+auto*.15,.75);
+      foil.style.background=`linear-gradient(${115+tx*45+auto*20}deg,rgba(255,80,80,.22) 0%,rgba(255,220,60,.22) 16%,rgba(60,255,100,.22) 32%,rgba(60,180,255,.22) 48%,rgba(220,80,255,.22) 64%,rgba(255,80,80,.22) 80%,transparent 100%)`;
+    }
+    if(shn){
+      shn.style.opacity=Math.min(mag*.45+Math.sin(shimmer*1.3)*.1+.05,.55);
+      shn.style.background=`radial-gradient(circle at ${50+tx*55}% ${50-ty*55}%,rgba(255,255,255,.45) 0%,transparent 55%)`;
+    }
+    rafId=requestAnimationFrame(frame);
+  }
+  rafId=requestAnimationFrame(frame);
+}
+function stopRaf(){ if(rafId){cancelAnimationFrame(rafId);rafId=null;} }
+
+function setupEvents(){
+  const ov=document.getElementById('fsov');
+  ov.addEventListener('mousemove',e=>{
+    const r=ov.getBoundingClientRect();
+    ttx=(e.clientX-r.left)/r.width*2-1;
+    tty=-((e.clientY-r.top)/r.height*2-1);
+  });
+  ov.addEventListener('mouseleave',()=>{ttx=0;tty=0;});
+  ov.addEventListener('touchmove',e=>{
+    if(!document.getElementById('fsov').classList.contains('show'))return;
+    e.preventDefault();
+    const r=ov.getBoundingClientRect(),t=e.touches[0];
+    ttx=(t.clientX-r.left)/r.width*2-1;
+    tty=-((t.clientY-r.top)/r.height*2-1);
+  },{passive:false});
+  ov.addEventListener('touchend',()=>{ttx=0;tty=0;});
+  const sc=document.getElementById('scene');
+  sc.addEventListener('mousedown',e=>{msx=e.clientX;});
+  sc.addEventListener('mouseup',e=>{if(Math.abs(e.clientX-msx)>30)flipCard();});
+  sc.addEventListener('touchstart',e=>{msx=e.touches[0].clientX;});
+  sc.addEventListener('touchend',e=>{if(Math.abs(e.changedTouches[0].clientX-msx)>30)flipCard();});
+}
+
+initData();
+document.getElementById('mscr').innerHTML=renderMinor();
+setupEvents();
+</script>
